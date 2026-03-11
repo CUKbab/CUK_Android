@@ -1,0 +1,153 @@
+<resources>
+    <string name="app_name" translatable="false">CUK밥</string>
+
+    <!-- Navigation Labels -->
+    <string name="screen_buon_pranzo" translatable="false">Buon Pranzo</string>
+    <string name="screen_cafe_bona" translatable="false">Cafe Bona</string>
+    <string name="screen_settings">Settings</string>
+
+    <!-- Menu Categories -->
+    <string name="category_1000_won_morning">1000 Won Morning</string>
+    <string name="category_korean_cuisine">Korean Cuisine</string>
+    <string name="category_global_noodle" translatable="false">Global Noodle</string>
+    <string name="category_plus_corner">Plus Corner</string>
+    <string name="category_dinner">Dinner</string>
+    <string name="category_rice_bowl">Rice Bowl</string>
+
+    <!-- Meal Groups -->
+    <string name="group_morning">Morning</string>
+    <string name="group_lunch">Lunch</string>
+    <string name="group_dinner">Dinner</string>
+
+    <!-- UI Elements -->
+    <string name="refresh">Refresh</string>
+    <string name="previous_day">Previous Day</string>
+    <string name="next_day">Next Day</string>
+    <string name="no_menu">No Menu</string>
+    <string name="failed_to_fetch_menu">Failed to fetch menu</string>
+    <string name="theme_selection">Theme Selection</string>
+    <string name="font_size_selection">Font Size Selection</string>
+    <string name="language_selection">Language Selection</string>
+    <string name="accent_color">Accent Color</string>
+    <string name="system_default">System Default</string>
+    <string name="show_operating_hours">Show Operating Hours</string>
+    <string name="show_operating_hours_desc">Display meal times next to category headers.</string>
+    <string name="feedback_support">Feedback &amp; Support</string>
+    <string name="back">Back</string>
+    <string name="whats_new">What\'s New!</string>
+    <string name="about">About</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="close">Close</string>
+    <string name="min">min</string>
+
+    <!-- Settings Submenus -->
+    <string name="display_settings">Display Settings</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="widget_settings">Widget Settings</string>
+    <string name="widget_number">Widget #%d</string>
+    <string name="select_cafeteria">Select Cafeteria</string>
+    <string name="select_category">Select Category</string>
+    <string name="widget_font_size">Widget Font Size</string>
+    <string name="no_widgets_found">No active widgets found.\nAdd a widget to your home screen first.</string>
+    <string name="cafeteria">Cafeteria</string>
+    <string name="category">Category</string>
+    <string name="widget_desc">Customize which menu is displayed on your home screen widget.</string>
+    <string name="plus_corner_included">Plus Corner included</string>
+    <string name="meal_reminders">Meal Reminders</string>
+    <string name="notification_desc">Notifications will be sent %1$d minutes before each scheduled meal start time.</string>
+
+    <!-- Feedback Buttons -->
+    <string name="report_menu_error">Report menu error</string>
+    <string name="suggest_feature">Suggest new feature</string>
+    <string name="report_bug">Report bug</string>
+
+    <!-- Feedback Dialog -->
+    <string name="issue_title">Title</string>
+    <string name="issue_description">Description</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+
+    <!-- Report Policy -->
+    <string name="report_policy_warning">Please use the reporting feature responsibly. Submitting false reports or inappropriate content may result in a temporary suspension of reporting privileges. Repeated misuse may result in permanent loss of reporting access.</string>
+    <string name="report_policy_understood">Understood</string>
+
+    <!-- Feedback Results -->
+    <string name="report_success">Report submitted successfully!</string>
+    <string name="report_duplicate">This issue has already been reported.</string>
+    <string name="report_error">An error occurred while submitting the report.</string>
+    <string name="open_github">Open on GitHub</string>
+
+    <!-- Authentication -->
+    <string name="account_settings">Account Settings</string>
+    <string name="login_with_google">Sign in with Google</string>
+    <string name="logout">Sign out</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_confirm_title">Delete Account?</string>
+    <string name="delete_account_confirm_desc">This action cannot be undone. All your data and reports will be permanently deleted.</string>
+    <string name="delete_account_success">Account deleted successfully.</string>
+    <string name="delete_account_error">Failed to delete account. You may need to sign in again for this action.</string>
+    <string name="logged_in_as">Signed in as %s</string>
+    <string name="login_to_access">Sign in to access more features</string>
+    <string name="user_blocked">You have been blocked from submitting reports due to misuse of the reporting system.</string>
+    <string name="banned_until">You will be able to submit reports again on %s.</string>
+    <string name="perma_banned">Your access to submitting reports has been permanently revoked.</string>
+    
+    <!-- Admin Panel -->
+    <string name="admin_panel">Admin Panel</string>
+    <string name="block_user">Block User</string>
+    <string name="block_user_7d">7-Day Ban</string>
+    <string name="block_user_perma">Perma Ban</string>
+    <string name="unblock_user">Unblock User</string>
+    <string name="user_status_updated">User status updated</string>
+
+    <string name="remind_me">Minutes before meal</string>
+    <string name="notification_scheduled">Notification scheduled</string>
+    <string name="notification_cancelled">Notification cancelled</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="cancel_reminder">Cancel Reminder</string>
+    <string name="report_deleted">Report deleted</string>
+    <string name="no_reports">No reports found</string>
+
+    <string name="default_web_client_id" translatable="false">773289207492-dek531i2a5tojmfdcfii5iml8chu91aq.apps.googleusercontent.com</string>
+
+    <!-- Preferences -->
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+
+    <!-- Notification Permissions -->
+    <string name="permission_required">Permission Required</string>
+    <string name="notification_permission_desc">To receive meal reminders, you need to grant notification permission.</string>
+    <string name="notification_permission_denied">Notification permission denied.</string>
+    <string name="exact_alarm_permission_desc">To receive meal reminders exactly on time, please allow the app to set precise alarms.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="grant_exact_alarm_permission">Grant Alarms &amp; Reminders Permission</string>
+
+    <!-- App Updater -->
+    <string name="update_available">Update Available!</string>
+    <string name="update_available_desc">A new version of CUK밥 (%s) is available on the Google Play Store.</string>
+    <string name="update">Update</string>
+    <string name="version_label">Version %s</string>
+    <string name="license_info">Open Source Licenses</string>
+    <string name="source_code">Menu Parser (Source)</string>
+    <string name="privacy_policy">Privacy Policy</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_skip">Skip</string>
+    <string name="tutorial_finish">Finish</string>
+    <string name="tutorial_welcome_title">Welcome to CUK밥!</string>
+    <string name="tutorial_welcome_desc">Let\'s take a quick tour of the new features.</string>
+    <string name="tutorial_calendar_title">Smart Calendar</string>
+    <string name="tutorial_calendar_desc">Tap the date to open the Dynamic Island calendar. You can jump to any date in the archive instantly!</string>
+    <string name="tutorial_settings_title">Customization</string>
+    <string name="tutorial_settings_desc">You can change themes, languages, and set meal reminders here.</string>
+    <string name="tutorial_display_desc">Adjust themes, font sizes, and accent colors to your liking.</string>
+    <string name="tutorial_notif_desc">Set up reminders so you never miss your favorite meal.</string>
+    <string name="tutorial_widget_desc">Configure your home screen widgets for quick access.</string>
+    <string name="tutorial_feedback_desc">Help us improve! Reporting bugs or suggesting features requires signing in, but you can report menu errors without logging in.</string>
+    <string name="tutorial_thank_you_title">You\'re all set!</string>
+    <string name="tutorial_thank_you_desc">Thank you for downloading and using CUK밥. We hope it makes your campus life a little bit easier!</string>
+    <string name="check_for_updates">Check for Updates</string>
+    <string name="on_latest_version">You are using the latest version.</string>
+</resources>

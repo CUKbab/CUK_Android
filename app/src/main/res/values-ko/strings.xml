@@ -1,0 +1,125 @@
+<resources>
+    <string name="screen_settings">설정</string>
+    <string name="category_1000_won_morning">천원의 아침</string>
+    <string name="category_korean_cuisine">한식</string>
+    <string name="category_plus_corner">플러스 코너</string>
+    <string name="category_dinner">석식</string>
+    <string name="category_rice_bowl">덮밥</string>
+    <string name="group_morning">조식</string>
+    <string name="group_lunch">중식</string>
+    <string name="group_dinner">석식</string>
+    <string name="refresh">새로고침</string>
+    <string name="previous_day">이전 날짜</string>
+    <string name="next_day">다음 날짜</string>
+    <string name="no_menu">메뉴 없음</string>
+    <string name="failed_to_fetch_menu">메뉴를 불러오는데 실패했습니다</string>
+    <string name="theme_selection">테마 설정</string>
+    <string name="font_size_selection">폰트 크기 설정</string>
+    <string name="language_selection">언어 설정</string>
+    <string name="accent_color">강조 색상</string>
+    <string name="system_default">시스템 기본값</string>
+    <string name="show_operating_hours_desc">카테고리 제목 옆에 식사 시간을 표시합니다.</string>
+    <string name="feedback_support">문의 및 피드백</string>
+    <string name="back">뒤로</string>
+    <string name="whats_new">업데이트 소식</string>
+    <string name="about">정보</string>
+    <string name="open_source_licenses">오픈소스 라이선스</string>
+    <string name="close">닫기</string>
+    <string name="min">분</string>
+    <string name="display_settings">화면 설정</string>
+    <string name="notification_settings">알림 설정</string>
+    <string name="widget_settings">위젯 설정</string>
+    <string name="widget_number">위젯 #%d</string>
+    <string name="select_cafeteria">식당 선택</string>
+    <string name="select_category">카테고리 선택</string>
+    <string name="widget_font_size">위젯 폰트 크기</string>
+    <string name="widget_desc">홈 화면 위젯에 표시될 메뉴를 설정합니다.</string>
+    <string name="no_widgets_found">활성화된 위젯이 없습니다.\n홈 화면에 위젯을 먼저 추가해 주세요.</string>
+    <string name="cafeteria">식당</string>
+    <string name="category">카테고리</string>
+    <string name="plus_corner_included">플러스 코너 포함</string>
+    <string name="meal_reminders">식단 알림</string>
+    <string name="notification_desc">식사 시작 %1$d분 전에 알림을 보냅니다.</string>
+    <string name="report_menu_error">식단 오류 제보</string>
+    <string name="suggest_feature">기능 제안</string>
+    <string name="report_bug">버그 제보</string>
+    <string name="issue_title">제목</string>
+    <string name="issue_description">내용</string>
+    <string name="cancel">취소</string>
+    <string name="submit">제출</string>
+    <string name="report_policy_warning">제보 기능을 책임감 있게 사용해 주세요. 허위 제보나 부적절한 내용을 제출할 경우 제보 권한이 일시적으로 정지될 수 있습니다. 반복적인 남용은 제보 권한의 영구적인 상실로 이어질 수 있습니다.</string>
+    <string name="report_policy_understood">이해했습니다</string>
+
+    <string name="report_success">제보가 성공적으로 제출되었습니다!</string>
+    <string name="report_duplicate">이미 제보된 내용입니다.</string>
+    <string name="report_error">제보 제출 중 오류가 발생했습니다.</string>
+    <string name="open_github">GitHub에서 열기</string>
+    <string name="account_settings">계정 설정</string>
+    <string name="login_with_google">Google로 로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="delete_account">계정 탈퇴</string>
+    <string name="delete_account_confirm_title">정말 탈퇴하시겠습니까?</string>
+    <string name="delete_account_confirm_desc">이 작업은 되돌릴 수 없습니다. 모든 데이터와 제보 내역이 영구적으로 삭제됩니다.</string>
+    <string name="delete_account_success">계정이 성공적으로 탈퇴되었습니다.</string>
+    <string name="delete_account_error">계정 탈퇴에 실패했습니다. 이 작업을 위해 다시 로그인해야 할 수도 있습니다.</string>
+    <string name="logged_in_as">%s님으로 로그인됨</string>
+    <string name="login_to_access">더 많은 기능을 위해 로그인하세요</string>
+    <string name="user_blocked">제보 시스템 남용으로 인해 제보 제출이 차단되었습니다.</string>
+    <string name="banned_until">%s에 다시 제보를 제출할 수 있습니다.</string>
+    <string name="perma_banned">제보 제출 권한이 영구적으로 취소되었습니다.</string>
+    
+    <string name="admin_panel">관리자 패널</string>
+    <string name="block_user">사용자 차단</string>
+    <string name="block_user_7d">7일 차단</string>
+    <string name="block_user_perma">영구 차단</string>
+    <string name="unblock_user">차단 해제</string>
+    <string name="user_status_updated">사용자 상태가 업데이트되었습니다</string>
+
+    <string name="remind_me">식사 시작 전 미리 알림</string>
+    <string name="notification_scheduled">알림이 예약되었습니다</string>
+    <string name="notification_cancelled">알림이 취소되었습니다</string>
+    <string name="set_reminder">알림 설정</string>
+    <string name="cancel_reminder">알림 취소</string>
+    <string name="report_deleted">제보 삭제됨</string>
+    <string name="no_reports">제보가 없습니다</string>
+    <string name="theme_light">라이트</string>
+    <string name="theme_dark">다크</string>
+    <string name="theme_system">시스템 설정</string>
+    <string name="show_operating_hours">운영 시간 표시</string>
+
+    <!-- Notification Permissions -->
+    <string name="permission_required">권한 필요</string>
+    <string name="notification_permission_desc">식단 알림을 받으려면 알림 권한을 허용해야 합니다.</string>
+    <string name="notification_permission_denied">알림 권한이 거부되었습니다.</string>
+    <string name="exact_alarm_permission_desc">식단 알림을 정확한 시간에 받으려면 정확한 알림 설정을 허용해 주세요.</string>
+    <string name="grant_permission">권한 허용</string>
+    <string name="grant_exact_alarm_permission">알람 및 리마인더 권한 허용</string>
+
+    <!-- App Updater -->
+    <string name="update_available">업데이트 가능!</string>
+    <string name="update_available_desc">Google Play 스토어에서 새로운 버전의 CUK밥 (%s)을 사용할 수 있습니다.</string>
+    <string name="update">업데이트</string>
+    <string name="version_label">버전 %s</string>
+    <string name="license_info">오픈소스 라이선스</string>
+    <string name="source_code">소스 코드</string>
+    <string name="privacy_policy">개인정보 처리방침</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_next">다음</string>
+    <string name="tutorial_skip">건너뛰기</string>
+    <string name="tutorial_finish">시작하기</string>
+    <string name="tutorial_welcome_title">CUK밥에 오신 것을 환영합니다!</string>
+    <string name="tutorial_welcome_desc">새로워진 기능들을 짧게 소개해 드릴게요.</string>
+    <string name="tutorial_calendar_title">스마트 캘린더</string>
+    <string name="tutorial_calendar_desc">날짜를 누르면 다이내믹 아일랜드 캘린더가 열립니다. 원하는 날짜의 식단을 바로 확인할 수 있어요!</string>
+    <string name="tutorial_settings_title">맞춤 설정</string>
+    <string name="tutorial_settings_desc">테마, 언어 변경 및 식단 알림 설정을 여기서 할 수 있습니다.</string>
+    <string name="tutorial_display_desc">테마, 글자 크기, 강조 색상을 취향에 맞게 조절해 보세요.</string>
+    <string name="tutorial_notif_desc">좋아하는 메뉴를 놓치지 않도록 미리 알림을 설정해 보세요.</string>
+    <string name="tutorial_widget_desc">홈 화면 위젯에 표시될 식당과 카테고리를 설정합니다.</string>
+    <string name="tutorial_feedback_desc">앱 개선에 참여해 보세요! 버그 제보나 기능 제안은 로그인이 필요하지만, 식단 오류 제보는 로그인 없이도 가능합니다.</string>
+    <string name="tutorial_thank_you_title">모든 준비가 끝났습니다!</string>
+    <string name="tutorial_thank_you_desc">CUK밥을 다운로드하고 사용해 주셔서 감사합니다. 여러분의 캠퍼스 생활이 조금 더 편리해지길 바랍니다!</string>
+    <string name="check_for_updates">업데이트 확인</string>
+    <string name="on_latest_version">최신 버전을 사용 중입니다.</string>
+</resources>

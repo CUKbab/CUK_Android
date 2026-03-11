@@ -1,0 +1,125 @@
+<resources>
+    <string name="screen_settings">設定</string>
+    <string name="category_1000_won_morning">1000ウォンの朝食</string>
+    <string name="category_korean_cuisine">韓国料理</string>
+    <string name="category_plus_corner">プラスコーナー</string>
+    <string name="category_dinner">夕食</string>
+    <string name="category_rice_bowl">丼物</string>
+    <string name="group_morning">朝食</string>
+    <string name="group_lunch">昼食</string>
+    <string name="group_dinner">夕食</string>
+    <string name="refresh">更新</string>
+    <string name="previous_day">前日</string>
+    <string name="next_day">翌日</string>
+    <string name="no_menu">メニューなし</string>
+    <string name="failed_to_fetch_menu">メニューの取得に失敗しました</string>
+    <string name="theme_selection">テーマ選択</string>
+    <string name="font_size_selection">フォントサイズ選択</string>
+    <string name="language_selection">言語選択</string>
+    <string name="accent_color">アクセントカラー</string>
+    <string name="system_default">システムデフォルト</string>
+    <string name="show_operating_hours_desc">カテゴリ見出しの横に食事時間を表示します。</string>
+    <string name="feedback_support">フィードバックとサポート</string>
+    <string name="back">戻る</string>
+    <string name="whats_new">最新情報</string>
+    <string name="about">このアプリについて</string>
+    <string name="open_source_licenses">オープンソースライセンス</string>
+    <string name="close">閉じる</string>
+    <string name="min">分</string>
+    <string name="display_settings">表示設定</string>
+    <string name="notification_settings">通知設定</string>
+    <string name="widget_settings">ウィジェット設定</string>
+    <string name="widget_number">ウィジェット #%d</string>
+    <string name="select_cafeteria">食堂を選択</string>
+    <string name="select_category">カテゴリーを選択</string>
+    <string name="widget_font_size">ウィジェットのフォントサイズ</string>
+    <string name="widget_desc">ホーム画面のウィジェットに表示するメニューをカスタマイズします。</string>
+    <string name="no_widgets_found">有効なウィジェットがありません。\nまずホーム画面にウィジェットを追加してください。</string>
+    <string name="cafeteria">食堂</string>
+    <string name="category">カテゴリー</string>
+    <string name="plus_corner_included">プラスコーナーを含む</string>
+    <string name="meal_reminders">食事のリマインダー</string>
+    <string name="notification_desc">食事開始の %1$d 分前に通知が送信されます。</string>
+    <string name="report_menu_error">メニューの誤りを報告</string>
+    <string name="suggest_feature">新機能を提案</string>
+    <string name="report_bug">バグを報告</string>
+    <string name="issue_title">タイトル</string>
+    <string name="issue_description">説明</string>
+    <string name="cancel">キャンセル</string>
+    <string name="submit">送信</string>
+    <string name="report_policy_warning">レポート機能は責任を持って使用してください。虚偽のレポートや不適切な内容を送信した場合、レポート権限が一時的に停止されることがあります。繰り返しの悪用は、レポート権限の永久的な喪失につながる可能性があります。</string>
+    <string name="report_policy_understood">理解しました</string>
+
+    <string name="report_success">レポートが送信されました！</string>
+    <string name="report_duplicate">この問題は既に報告されています。</string>
+    <string name="report_error">レポートの送信中にエラーが発生しました。</string>
+    <string name="open_github">GitHubで開く</string>
+    <string name="account_settings">アカウント設定</string>
+    <string name="login_with_google">Googleでサインイン</string>
+    <string name="logout">ログアウト</string>
+    <string name="delete_account">アカウントを削除</string>
+    <string name="delete_account_confirm_title">アカウントを削除しますか？</string>
+    <string name="delete_account_confirm_desc">この操作は元に戻せません。すべてのデータとレポートが永久に削除されます。</string>
+    <string name="delete_account_success">アカウントが正常に削除されました。</string>
+    <string name="delete_account_error">アカウントの削除に失敗しました。この操作のために再度ログインする必要がある場合があります。</string>
+    <string name="logged_in_as">%sとしてサインイン中</string>
+    <string name="login_to_access">さらに機能を利用するにはサインインしてください</string>
+    <string name="user_blocked">レポートシステムの悪用により、レポートの送信がブロックされました。</string>
+    <string name="banned_until">%sに再びレポートを送信できるようになります。</string>
+    <string name="perma_banned">レポートを送信する権限が永久に取り消されました。</string>
+    
+    <string name="admin_panel">管理者パネル</string>
+    <string name="block_user">ユーザーをブロック</string>
+    <string name="block_user_7d">7日間の禁止</string>
+    <string name="block_user_perma">永久追放</string>
+    <string name="unblock_user">ブロック解除</string>
+    <string name="user_status_updated">ユーザーのステータスが更新されました</string>
+    <string name="remind_me">食事の何分前に通知</string>
+    <string name="notification_scheduled">通知が予約されました</string>
+    <string name="notification_cancelled">通知がキャンセルされました</string>
+    <string name="set_reminder">リマインダーを設定</string>
+    <string name="cancel_reminder">リマインダーをキャンセル</string>
+    <string name="report_deleted">レポートが削除されました</string>
+    <string name="no_reports">レポートはありません</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_system">システム</string>
+    <string name="show_operating_hours">営業時間を表示</string>
+
+    <!-- Notification Permissions -->
+    <string name="permission_required">権限が必要です</string>
+    <string name="notification_permission_desc">献立の通知を受け取るには、通知の権限を許可する必要があります。</string>
+    <string name="notification_permission_denied">通知の権限が拒否されました。</string>
+    <string name="exact_alarm_permission_desc">食事の通知を正確な時間に受け取るには、正確なアラームを設定することをアプリに許可してください。</string>
+    <string name="grant_permission">権限を許可</string>
+    <string name="grant_exact_alarm_permission">アラームとリマインダーの権限を許可</string>
+
+    <!-- App Updater -->
+    <string name="update_available">アップデートが利用可能です！</string>
+    <string name="update_available_desc">Google Play ストアで CUK밥 の新しいバージョン (%s) が利用可能です。</string>
+    <string name="update">アップデート</string>
+    <string name="version_label">バージョン %s</string>
+    <string name="license_info">オープンソースライセンス</string>
+    <string name="source_code">ソースコード</string>
+    <string name="privacy_policy">プライバシーポリシー</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_next">次へ</string>
+    <string name="tutorial_skip">スキップ</string>
+    <string name="tutorial_finish">始める</string>
+    <string name="tutorial_welcome_title">CUK밥へようこそ！</string>
+    <string name="tutorial_welcome_desc">新機能を簡単にご紹介します。</string>
+    <string name="tutorial_calendar_title">スマートカレンダー</string>
+    <string name="tutorial_calendar_desc">日付をタップすると、ダイナミックアイランドカレンダーが開きます。アーカイブ内のどの日付にもすぐにジャンプできます！</string>
+    <string name="tutorial_settings_title">カスタマイズ</string>
+    <string name="tutorial_settings_desc">テーマ、言語の変更、食事のリマインダー設定がここで行えます。</string>
+    <string name="tutorial_display_desc">テーマ、フォントサイズ、アクセントカラーを好みに合わせて調整できます。</string>
+    <string name="tutorial_notif_desc">お気に入りの食事を逃さないよう、リマインダーを設定しましょう。</string>
+    <string name="tutorial_widget_desc">ホーム画面のウィジェットに表示するメニューを設定します。</string>
+    <string name="tutorial_feedback_desc">改善にご協力ください！バグ報告や機能提案にはログインが必要ですが、献立の誤り報告はログインなしで行えます。</string>
+    <string name="tutorial_thank_you_title">準備完了です！</string>
+    <string name="tutorial_thank_you_desc">CUK밥をダウンロードしてご利用いただきありがとうございます。キャンパスライフが少しでも便利になることを願っています！</string>
+
+    <string name="check_for_updates">アップデートを確認</string>
+    <string name="on_latest_version">最新バージョンを使用しています。</string>
+</resources>
