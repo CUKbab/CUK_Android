@@ -32,6 +32,9 @@
     <string name="system_default">System Default</string>
     <string name="show_operating_hours">Show Operating Hours</string>
     <string name="show_operating_hours_desc">Display meal times next to category headers.</string>
+    <string name="experimental_features">Experimental Features</string>
+    <string name="dual_pane_mode">Dual Pane Mode</string>
+    <string name="dual_pane_mode_desc">Show both cafeterias side-by-side on tablets and foldables.</string>
     <string name="feedback_support">Feedback &amp; Support</string>
     <string name="back">Back</string>
     <string name="whats_new">What\'s New!</string>

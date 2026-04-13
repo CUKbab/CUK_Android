@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         val initialThemePreference = try { ThemePreference.valueOf(themeStr) } catch(e: Exception) { ThemePreference.System }
         val initialBaseFontSize = prefs.getFloat("font_size", DEFAULT_FONT_SIZE)
         val initialShowOperatingHours = prefs.getBoolean("show_operating_hours", true)
+        val initialExperimentalDualPane = prefs.getBoolean("experimental_dual_pane", false)
         val initialColorArgb = prefs.getLong("accent_color", -1L)
         val initialCustomAccentColor = if (initialColorArgb != -1L) {
             Color(initialColorArgb.toInt())
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity() {
             var themePreference by remember { mutableStateOf(initialThemePreference) }
             var baseFontSize by remember { mutableFloatStateOf(initialBaseFontSize) }
             var showOperatingHours by remember { mutableStateOf(initialShowOperatingHours) }
+            var experimentalDualPane by remember { mutableStateOf(initialExperimentalDualPane) }
             var customAccentColor by remember { mutableStateOf<Color?>(initialCustomAccentColor) }
             var updateInfo by remember { mutableStateOf<AppVersion?>(null) }
             var languagePreference by remember { mutableStateOf(initialLanguage) }
@@ -101,6 +103,11 @@ class MainActivity : AppCompatActivity() {
                     onShowOperatingHoursChange = {
                         showOperatingHours = it
                         prefs.edit { putBoolean("show_operating_hours", it) }
+                    },
+                    experimentalDualPane = experimentalDualPane,
+                    onExperimentalDualPaneChange = {
+                        experimentalDualPane = it
+                        prefs.edit { putBoolean("experimental_dual_pane", it) }
                     },
                     languagePreference = languagePreference,
                     onLanguageChange = {

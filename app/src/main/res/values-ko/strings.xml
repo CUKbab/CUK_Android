@@ -19,6 +19,9 @@
     <string name="accent_color">강조 색상</string>
     <string name="system_default">시스템 기본값</string>
     <string name="show_operating_hours_desc">카테고리 제목 옆에 식사 시간을 표시합니다.</string>
+    <string name="experimental_features">실험실 기능</string>
+    <string name="dual_pane_mode">듀얼 패널 모드</string>
+    <string name="dual_pane_mode_desc">태블릿이나 폴더블 기기에서 두 식당을 나란히 표시합니다.</string>
     <string name="feedback_support">문의 및 피드백</string>
     <string name="back">뒤로</string>
     <string name="whats_new">업데이트 소식</string>

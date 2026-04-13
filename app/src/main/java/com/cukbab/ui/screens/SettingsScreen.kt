@@ -25,6 +25,8 @@ fun SettingsScreen(
     onFontSizeChange: (Float) -> Unit,
     showOperatingHours: Boolean,
     onShowOperatingHoursChange: (Boolean) -> Unit,
+    experimentalDualPane: Boolean,
+    onExperimentalDualPaneChange: (Boolean) -> Unit,
     languagePreference: LanguagePreference,
     onLanguageChange: (LanguagePreference) -> Unit,
     customAccentColor: Color?,
@@ -61,7 +63,9 @@ fun SettingsScreen(
             SettingsSubMenu.Account -> AccountSettingsScreen(onBack = { currentSubMenu = null })
             SettingsSubMenu.Display -> DisplaySettingsScreen(
                 themePreference, onThemeChange, baseFontSize, onFontSizeChange,
-                showOperatingHours, onShowOperatingHoursChange, languagePreference, onLanguageChange,
+                showOperatingHours, onShowOperatingHoursChange,
+                experimentalDualPane, onExperimentalDualPaneChange,
+                languagePreference, onLanguageChange,
                 customAccentColor, onAccentColorChange,
                 onBack = { currentSubMenu = null }
             )

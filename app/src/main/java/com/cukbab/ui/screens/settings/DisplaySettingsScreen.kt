@@ -40,6 +40,8 @@ fun DisplaySettingsScreen(
     onFontSizeChange: (Float) -> Unit,
     showOperatingHours: Boolean,
     onShowOperatingHoursChange: (Boolean) -> Unit,
+    experimentalDualPane: Boolean,
+    onExperimentalDualPaneChange: (Boolean) -> Unit,
     languagePreference: LanguagePreference,
     onLanguageChange: (LanguagePreference) -> Unit,
     customAccentColor: Color?,
@@ -243,6 +245,37 @@ fun DisplaySettingsScreen(
             }
         }
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = stringResource(R.string.experimental_features),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.dual_pane_mode),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = stringResource(R.string.dual_pane_mode_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = experimentalDualPane,
+                onCheckedChange = onExperimentalDualPaneChange
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

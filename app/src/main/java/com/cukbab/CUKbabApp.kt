@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
+import androidx.window.layout.FoldingFeature
+import androidx.window.layout.WindowInfoTracker
 import com.cukbab.data.*
 import com.cukbab.ui.components.DateSelector
 import com.cukbab.ui.components.AnimatedTutorialOverlay
@@ -74,6 +76,8 @@ fun CUKbabApp(
     onFontSizeChange: (Float) -> Unit,
     showOperatingHours: Boolean,
     onShowOperatingHoursChange: (Boolean) -> Unit,
+    experimentalDualPane: Boolean,
+    onExperimentalDualPaneChange: (Boolean) -> Unit,
     languagePreference: LanguagePreference,
     onLanguageChange: (LanguagePreference) -> Unit,
     customAccentColor: androidx.compose.ui.graphics.Color?,
@@ -96,6 +100,12 @@ fun CUKbabApp(
     var showChangelog by remember { mutableStateOf(false) }
     var pendingChangelog by remember { mutableStateOf(false) }
     val context = androidx.compose.ui.platform.LocalContext.current
+
+    val foldingFeature = remember(context) {
+        WindowInfoTracker.getOrCreate(context).windowLayoutInfo(context as android.app.Activity)
+    }.collectAsState(initial = null).value?.displayFeatures?.filterIsInstance<FoldingFeature>()?.firstOrNull()
+
+    val isDualPaneEnabled = experimentalDualPane && (windowWidthSizeClass != WindowWidthSizeClass.Compact || foldingFeature != null)
 
     val scope = rememberCoroutineScope()
     val failedToFetchMenu = stringResource(R.string.failed_to_fetch_menu)
@@ -225,15 +235,17 @@ fun CUKbabApp(
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        NavigationBar {
-                            screenList.forEach { screen ->
-                                val label = stringResource(screen.labelRes)
-                                NavigationBarItem(
-                                    icon = { Icon(screen.icon, contentDescription = label) },
-                                    label = { Text(label) },
-                                    selected = selectedScreen == screen,
-                                    onClick = { selectedScreen = screen }
-                                )
+                        if (!isDualPaneEnabled) {
+                            NavigationBar {
+                                screenList.forEach { screen ->
+                                    val label = stringResource(screen.labelRes)
+                                    NavigationBarItem(
+                                        icon = { Icon(screen.icon, contentDescription = label) },
+                                        label = { Text(label) },
+                                        selected = selectedScreen == screen,
+                                        onClick = { selectedScreen = screen }
+                                    )
+                                }
                             }
                         }
                     },
@@ -264,6 +276,8 @@ fun CUKbabApp(
                         onFontSizeChange,
                         showOperatingHours,
                         onShowOperatingHoursChange,
+                        experimentalDualPane,
+                        onExperimentalDualPaneChange,
                         languagePreference,
                         onLanguageChange,
                         customAccentColor,
@@ -275,30 +289,35 @@ fun CUKbabApp(
                         onWidgetCoordsMeasured = { widgetCoords = it },
                         onNotifCoordsMeasured = { notifCoords = it },
                         onFeedbackCoordsMeasured = { feedbackCoords = it },
-                        Modifier.padding(innerPadding)
+                        isDualPaneEnabled = isDualPaneEnabled,
+                        onSettingsClick = { selectedScreen = Screen.Settings },
+                        onMenuClick = { selectedScreen = Screen.BuonPranzo },
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             } else {
                 Row(modifier = Modifier.fillMaxSize()) {
-                    NavigationRail(
-                        modifier = Modifier.systemBarsPadding(),
-                        header = {
-                            IconButton(onClick = { refreshMenu(true, selectedDate) }) {
-                                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                    if (!isDualPaneEnabled) {
+                        NavigationRail(
+                            modifier = Modifier.systemBarsPadding(),
+                            header = {
+                                IconButton(onClick = { refreshMenu(true, selectedDate) }) {
+                                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                                }
                             }
+                        ) {
+                            Spacer(Modifier.weight(1f))
+                            screenList.forEach { screen ->
+                                val label = stringResource(screen.labelRes)
+                                NavigationRailItem(
+                                    icon = { Icon(screen.icon, contentDescription = label) },
+                                    label = { Text(label) },
+                                    selected = selectedScreen == screen,
+                                    onClick = { selectedScreen = screen }
+                                )
+                            }
+                            Spacer(Modifier.weight(1f))
                         }
-                    ) {
-                        Spacer(Modifier.weight(1f))
-                        screenList.forEach { screen ->
-                            val label = stringResource(screen.labelRes)
-                            NavigationRailItem(
-                                icon = { Icon(screen.icon, contentDescription = label) },
-                                label = { Text(label) },
-                                selected = selectedScreen == screen,
-                                onClick = { selectedScreen = screen }
-                            )
-                        }
-                        Spacer(Modifier.weight(1f))
                     }
                     val menuData = when (val state = uiState) {
                         is MenuUiState.Success -> state.menuData
@@ -325,6 +344,8 @@ fun CUKbabApp(
                         onFontSizeChange,
                         showOperatingHours,
                         onShowOperatingHoursChange,
+                        experimentalDualPane,
+                        onExperimentalDualPaneChange,
                         languagePreference,
                         onLanguageChange,
                         customAccentColor,
@@ -336,6 +357,9 @@ fun CUKbabApp(
                         onWidgetCoordsMeasured = { widgetCoords = it },
                         onNotifCoordsMeasured = { notifCoords = it },
                         onFeedbackCoordsMeasured = { feedbackCoords = it },
+                        isDualPaneEnabled = isDualPaneEnabled,
+                        onSettingsClick = { selectedScreen = Screen.Settings },
+                        onMenuClick = { selectedScreen = Screen.BuonPranzo },
                         Modifier
                             .fillMaxSize()
                             .systemBarsPadding()
@@ -408,6 +432,8 @@ fun AnimatedContentArea(
     onFontSizeChange: (Float) -> Unit,
     showOperatingHours: Boolean,
     onShowOperatingHoursChange: (Boolean) -> Unit,
+    experimentalDualPane: Boolean,
+    onExperimentalDualPaneChange: (Boolean) -> Unit,
     languagePreference: LanguagePreference,
     onLanguageChange: (LanguagePreference) -> Unit,
     customAccentColor: androidx.compose.ui.graphics.Color?,
@@ -419,6 +445,9 @@ fun AnimatedContentArea(
     onWidgetCoordsMeasured: (LayoutCoordinates) -> Unit,
     onNotifCoordsMeasured: (LayoutCoordinates) -> Unit,
     onFeedbackCoordsMeasured: (LayoutCoordinates) -> Unit,
+    isDualPaneEnabled: Boolean,
+    onSettingsClick: () -> Unit,
+    onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -452,6 +481,8 @@ fun AnimatedContentArea(
             onFontSizeChange,
             showOperatingHours,
             onShowOperatingHoursChange,
+            experimentalDualPane,
+            onExperimentalDualPaneChange,
             languagePreference,
             onLanguageChange,
             customAccentColor,
@@ -463,6 +494,9 @@ fun AnimatedContentArea(
             onWidgetCoordsMeasured,
             onNotifCoordsMeasured,
             onFeedbackCoordsMeasured,
+            isDualPaneEnabled,
+            onSettingsClick,
+            onMenuClick,
             modifier
         )
     }
@@ -485,6 +519,8 @@ fun ContentArea(
     onFontSizeChange: (Float) -> Unit,
     showOperatingHours: Boolean,
     onShowOperatingHoursChange: (Boolean) -> Unit,
+    experimentalDualPane: Boolean,
+    onExperimentalDualPaneChange: (Boolean) -> Unit,
     languagePreference: LanguagePreference,
     onLanguageChange: (LanguagePreference) -> Unit,
     customAccentColor: androidx.compose.ui.graphics.Color?,
@@ -496,6 +532,9 @@ fun ContentArea(
     onWidgetCoordsMeasured: (LayoutCoordinates) -> Unit,
     onNotifCoordsMeasured: (LayoutCoordinates) -> Unit,
     onFeedbackCoordsMeasured: (LayoutCoordinates) -> Unit,
+    isDualPaneEnabled: Boolean,
+    onSettingsClick: () -> Unit,
+    onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dateString = remember(selectedDate) { selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
@@ -511,41 +550,136 @@ fun ContentArea(
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(screen.labelRes),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-            )
+            if (!isDualPaneEnabled) {
+                Text(
+                    text = stringResource(screen.labelRes),
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                )
 
-            if (screen !is Screen.Settings) {
-                DateSelector(
-                    selectedDate = selectedDate,
-                    onDateChange = onDateChange,
-                    onCoordsMeasured = onCalendarCoordsMeasured
-                )
-            }
+                if (screen !is Screen.Settings) {
+                    DateSelector(
+                        selectedDate = selectedDate,
+                        onDateChange = onDateChange,
+                        onCoordsMeasured = onCalendarCoordsMeasured
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            when (screen) {
-                is Screen.BuonPranzo -> BuonPranzoScreen(
-                    menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
-                )
-                is Screen.CafeBona -> CafeBonaScreen(
-                    menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
-                )
-                is Screen.Settings -> SettingsScreen(
-                    themePreference, onThemeChange, baseFontSize, onFontSizeChange, 
-                    showOperatingHours, onShowOperatingHoursChange, languagePreference, onLanguageChange,
-                    customAccentColor, onAccentColorChange,
-                    onShowChangelog = onShowChangelog,
-                    onUpdateFound = onUpdateFound,
-                    onDisplayCoordsMeasured = onDisplayCoordsMeasured,
-                    onWidgetCoordsMeasured = onWidgetCoordsMeasured,
-                    onNotifCoordsMeasured = onNotifCoordsMeasured,
-                    onFeedbackCoordsMeasured = onFeedbackCoordsMeasured
-                )
+                when (screen) {
+                    is Screen.BuonPranzo -> BuonPranzoScreen(
+                        menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                    )
+                    is Screen.CafeBona -> CafeBonaScreen(
+                        menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                    )
+                    is Screen.Settings -> SettingsScreen(
+                        themePreference, onThemeChange, baseFontSize, onFontSizeChange, 
+                        showOperatingHours, onShowOperatingHoursChange,
+                        experimentalDualPane, onExperimentalDualPaneChange,
+                        languagePreference, onLanguageChange,
+                        customAccentColor, onAccentColorChange,
+                        onShowChangelog = onShowChangelog,
+                        onUpdateFound = onUpdateFound,
+                        onDisplayCoordsMeasured = onDisplayCoordsMeasured,
+                        onWidgetCoordsMeasured = onWidgetCoordsMeasured,
+                        onNotifCoordsMeasured = onNotifCoordsMeasured,
+                        onFeedbackCoordsMeasured = onFeedbackCoordsMeasured
+                    )
+                }
+            } else {
+                // Dual Pane Mode Top Bar
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (screen is Screen.Settings) {
+                            IconButton(onClick = onMenuClick) {
+                                Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.screen_buon_pranzo))
+                            }
+                        } else {
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.screen_settings))
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(onClick = onRefresh) {
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                        }
+                    }
+                    
+                    if (screen !is Screen.Settings) {
+                        DateSelector(
+                            selectedDate = selectedDate,
+                            onDateChange = onDateChange,
+                            onCoordsMeasured = onCalendarCoordsMeasured
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(screen.labelRes),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (screen is Screen.Settings) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        SettingsScreen(
+                            themePreference, onThemeChange, baseFontSize, onFontSizeChange, 
+                            showOperatingHours, onShowOperatingHoursChange,
+                            experimentalDualPane, onExperimentalDualPaneChange,
+                            languagePreference, onLanguageChange,
+                            customAccentColor, onAccentColorChange,
+                            onShowChangelog = onShowChangelog,
+                            onUpdateFound = onUpdateFound,
+                            onDisplayCoordsMeasured = onDisplayCoordsMeasured,
+                            onWidgetCoordsMeasured = onWidgetCoordsMeasured,
+                            onNotifCoordsMeasured = onNotifCoordsMeasured,
+                            onFeedbackCoordsMeasured = onFeedbackCoordsMeasured
+                        )
+                    }
+                } else {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            Column {
+                                Text(
+                                    text = stringResource(Screen.BuonPranzo.labelRes),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.padding(bottom = 8.dp).align(Alignment.CenterHorizontally)
+                                )
+                                BuonPranzoScreen(
+                                    menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                                )
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.width(16.dp))
+                        VerticalDivider(modifier = Modifier.fillMaxHeight().padding(vertical = 16.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Box(modifier = Modifier.weight(1f)) {
+                            Column {
+                                Text(
+                                    text = stringResource(Screen.CafeBona.labelRes),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.padding(bottom = 8.dp).align(Alignment.CenterHorizontally)
+                                )
+                                CafeBonaScreen(
+                                    menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
