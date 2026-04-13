@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.cukbab.BuildConfig
 import com.cukbab.R
 import com.cukbab.data.*
 import kotlinx.coroutines.launch
@@ -106,21 +107,25 @@ fun SettingsMainScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
-        if (currentUser?.email == ADMIN_EMAIL) {
-            SettingsMenuItem(
-                title = stringResource(R.string.admin_panel),
-                icon = Icons.Default.AdminPanelSettings,
-                onClick = { onNavigate(SettingsSubMenu.Admin) }
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp).alpha(0.5f))
-        }
+        if (BuildConfig.SHOW_AUTH_FEATURES) {
+            if (currentUser?.email == ADMIN_EMAIL) {
+                SettingsMenuItem(
+                    title = stringResource(R.string.admin_panel),
+                    icon = Icons.Default.AdminPanelSettings,
+                    onClick = { onNavigate(SettingsSubMenu.Admin) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp).alpha(0.5f)
+                )
+            }
 
-        SettingsMenuItem(
-            title = stringResource(R.string.account_settings),
-            icon = Icons.Default.AccountCircle,
-            imageUrl = currentUser?.photoUrl?.toString(),
-            onClick = { onNavigate(SettingsSubMenu.Account) }
-        )
+            SettingsMenuItem(
+                title = stringResource(R.string.account_settings),
+                icon = Icons.Default.AccountCircle,
+                imageUrl = currentUser?.photoUrl?.toString(),
+                onClick = { onNavigate(SettingsSubMenu.Account) }
+            )
+        }
         
         SettingsMenuItem(
             title = stringResource(R.string.display_settings),
@@ -154,41 +159,43 @@ fun SettingsMainScreen(
             onClick = { onNavigate(SettingsSubMenu.About) }
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        if (BuildConfig.SHOW_AUTH_FEATURES) {
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Column(modifier = Modifier.onGloballyPositioned { onFeedbackCoordsMeasured(it) }) {
-            Text(
-                text = stringResource(R.string.feedback_support),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            Column(modifier = Modifier.onGloballyPositioned { onFeedbackCoordsMeasured(it) }) {
+                Text(
+                    text = stringResource(R.string.feedback_support),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-            FeedbackButton(
-                text = stringResource(R.string.report_menu_error),
-                icon = Icons.Default.RestaurantMenu,
-                isLoading = isReporting,
-                onClick = { 
-                    handleFeedbackClick(ReportType.MenuError)
-                }
-            )
-            FeedbackButton(
-                text = stringResource(R.string.suggest_feature),
-                icon = Icons.Default.Lightbulb,
-                enabled = currentUser != null,
-                isLoading = isReporting,
-                onClick = { 
-                    handleFeedbackClick(ReportType.Feature)
-                }
-            )
-            FeedbackButton(
-                text = stringResource(R.string.report_bug),
-                icon = Icons.Default.BugReport,
-                enabled = currentUser != null,
-                isLoading = isReporting,
-                onClick = { 
-                    handleFeedbackClick(ReportType.Bug)
-                }
-            )
+                FeedbackButton(
+                    text = stringResource(R.string.report_menu_error),
+                    icon = Icons.Default.RestaurantMenu,
+                    isLoading = isReporting,
+                    onClick = {
+                        handleFeedbackClick(ReportType.MenuError)
+                    }
+                )
+                FeedbackButton(
+                    text = stringResource(R.string.suggest_feature),
+                    icon = Icons.Default.Lightbulb,
+                    enabled = currentUser != null,
+                    isLoading = isReporting,
+                    onClick = {
+                        handleFeedbackClick(ReportType.Feature)
+                    }
+                )
+                FeedbackButton(
+                    text = stringResource(R.string.report_bug),
+                    icon = Icons.Default.BugReport,
+                    enabled = currentUser != null,
+                    isLoading = isReporting,
+                    onClick = {
+                        handleFeedbackClick(ReportType.Bug)
+                    }
+                )
+            }
         }
         
         Spacer(modifier = Modifier.height(16.dp))

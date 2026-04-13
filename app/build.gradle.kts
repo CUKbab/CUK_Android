@@ -11,6 +11,14 @@ android {
     namespace = "com.cukbab"
     compileSdk = 36
 
+    val keystorePropertiesFile = rootProject.file("local.properties")
+    val keystoreProperties = Properties()
+    val hasKeystore = keystorePropertiesFile.exists()
+
+    if (hasKeystore) {
+        keystoreProperties.load(keystorePropertiesFile.inputStream())
+    }
+
     defaultConfig {
         applicationId = "com.cukbab"
         minSdk = 30
@@ -20,14 +28,11 @@ android {
         versionName = "2.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
 
-    val keystorePropertiesFile = rootProject.file("local.properties")
-    val keystoreProperties = Properties()
-    val hasKeystore = keystorePropertiesFile.exists()
-
-    if (hasKeystore) {
-        keystoreProperties.load(keystorePropertiesFile.inputStream())
+        buildConfigField("String", "ADMIN_EMAIL", "\"${keystoreProperties["adminEmail"] ?: ""}\"")
+        buildConfigField("String", "REPORTER_BASE_URL", "\"${keystoreProperties["reporterBaseUrl"] ?: ""}\"")
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${keystoreProperties["googleClientId"] ?: ""}\"")
+        buildConfigField("Boolean", "SHOW_AUTH_FEATURES", (project.findProperty("showAuthFeatures") ?: "true").toString())
     }
 
     signingConfigs {
@@ -61,6 +66,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

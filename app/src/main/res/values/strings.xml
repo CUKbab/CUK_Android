@@ -108,8 +108,6 @@
     <string name="report_deleted">Report deleted</string>
     <string name="no_reports">No reports found</string>
 
-    <string name="default_web_client_id" translatable="false">773289207492-dek531i2a5tojmfdcfii5iml8chu91aq.apps.googleusercontent.com</string>
-
     <!-- Preferences -->
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>

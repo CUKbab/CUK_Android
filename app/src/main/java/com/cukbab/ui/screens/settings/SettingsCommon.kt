@@ -21,11 +21,13 @@ import com.cukbab.R
 import java.text.SimpleDateFormat
 import java.util.*
 
+import com.cukbab.BuildConfig
+
 enum class SettingsSubMenu {
     Main, Account, Display, Notifications, Admin, Widget, About
 }
 
-const val ADMIN_EMAIL = "gyuminleo@gmail.com"
+const val ADMIN_EMAIL = BuildConfig.ADMIN_EMAIL
 
 enum class ReportType(val label: String) {
     MenuError("menu-error"),

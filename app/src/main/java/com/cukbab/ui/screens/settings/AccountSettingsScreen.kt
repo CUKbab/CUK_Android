@@ -36,11 +36,13 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+import com.cukbab.BuildConfig
+
 @Composable
 fun AccountSettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    
+
     BackHandler(onBack = onBack)
 
     val currentUser by AuthRepository.currentUser.collectAsState()
@@ -48,8 +50,7 @@ fun AccountSettingsScreen(onBack: () -> Unit) {
     var isLoggingIn by remember { mutableStateOf(false) }
 
     val credentialManager = CredentialManager.create(context)
-    val webClientId = stringResource(R.string.default_web_client_id)
-
+    val webClientId = BuildConfig.GOOGLE_CLIENT_ID
     suspend fun handleSignIn() {
         isLoggingIn = true
         val googleIdOption = GetGoogleIdOption.Builder()

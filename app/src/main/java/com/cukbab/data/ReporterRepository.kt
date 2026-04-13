@@ -1,5 +1,6 @@
 package com.cukbab.data
 
+import com.cukbab.BuildConfig
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Exclude
@@ -71,7 +72,7 @@ interface ReporterService {
 }
 
 object ReporterClient {
-    private const val BASE_URL = "https://github-reporter.cukbab.workers.dev/"
+    private val BASE_URL = BuildConfig.REPORTER_BASE_URL
     private val db get() = FirebaseFirestore.getInstance()
 
     val service: ReporterService by lazy {
