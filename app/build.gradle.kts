@@ -3,8 +3,12 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
-    id("com.google.gms.google-services")
     id("com.google.android.gms.oss-licenses-plugin")
+}
+
+// Conditionally apply Google Services plugin only for non-lite builds
+if (project.findProperty("isLite") != "true") {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {
@@ -32,7 +36,20 @@ android {
         buildConfigField("String", "ADMIN_EMAIL", "\"${keystoreProperties["adminEmail"] ?: ""}\"")
         buildConfigField("String", "REPORTER_BASE_URL", "\"${keystoreProperties["reporterBaseUrl"] ?: ""}\"")
         buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${keystoreProperties["googleClientId"] ?: ""}\"")
-        buildConfigField("Boolean", "SHOW_AUTH_FEATURES", (project.findProperty("showAuthFeatures") ?: "true").toString())
+    }
+
+    flavorDimensions += "version"
+    productFlavors {
+        create("full") {
+            dimension = "version"
+            buildConfigField("Boolean", "SHOW_AUTH_FEATURES", "true")
+        }
+        create("lite") {
+            dimension = "version"
+            applicationIdSuffix = ".lite"
+            versionNameSuffix = "-lite"
+            buildConfigField("Boolean", "SHOW_AUTH_FEATURES", "false")
+        }
     }
 
     signingConfigs {
@@ -91,16 +108,16 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
     implementation(libs.material)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(libs.play.services.auth)
+    // Firebase & Auth (Full version only)
+    "fullImplementation"(platform(libs.firebase.bom))
+    "fullImplementation"(libs.firebase.auth)
+    "fullImplementation"(libs.firebase.firestore)
+    "fullImplementation"(libs.play.services.auth)
+    "fullImplementation"(libs.androidx.credentials)
+    "fullImplementation"(libs.androidx.credentials.play.services.auth)
+    "fullImplementation"(libs.googleid)
 
     // Retrofit & Networking
     implementation(libs.retrofit)
