@@ -1,10 +1,7 @@
-name: Android CI
+name: CUKbab Release
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -15,18 +12,20 @@ on:
         default: 'v2.1.0'
 
 jobs:
-  build-apk:
+  build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
-      
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -39,45 +38,63 @@ jobs:
         run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: false
 
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Fetch Changelog
-        if: github.event_name == 'workflow_dispatch'
+      - name: Build Variants
         run: |
-          curl -s https://raw.githubusercontent.com/CUKbab/CUK/refs/heads/main/changelogs/en.md > release_notes.md
-
-      - name: Build Full Release APK
-        run: ./gradlew assembleFullRelease
+          ./gradlew assembleFullRelease
+          ./gradlew assembleLiteRelease -PisLite=true
 
       - name: Sign Full APK
         uses: r0adkll/sign-android-release@v1
-        id: sign_app
+        id: sign_full
         with:
           releaseDirectory: app/build/outputs/apk/full/release
           signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Rename Signed APK
-        run: mv ${{ steps.sign_app.outputs.signedReleaseFile }} app/build/outputs/apk/full/release/cuk밥-full-release.apk
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Sign Lite APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_lite
         with:
-          name: cuk밥-full-release
-          path: app/build/outputs/apk/full/release/cuk밥-full-release.apk
+          releaseDirectory: app/build/outputs/apk/lite/release
+          signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
+          alias: ${{ secrets.RELEASE_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
+
+      - name: Prepare APKs
+        run: |
+          mv ${{ steps.sign_full.outputs.signedReleaseFile }} app/build/outputs/apk/full/release/cuk밥-full-release.apk
+          mv ${{ steps.sign_lite.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
+
+      - name: Fetch and Prepare Changelog
+        run: |
+          # Fetch the latest English changelog from the main CUK repo
+          curl -s https://raw.githubusercontent.com/CUKbab/CUK/refs/heads/main/changelogs/en.md > release_notes.md
+          
+          # Append the Lite version explanation
+          echo -e "\n---\n## CUKbab Lite Edition\nThis is an open-source friendly version of CUKbab with the following changes:\n- **No Firebase:** Completely removed Google Firebase and Google Services dependencies.\n- **Privacy Focused:** Removed all analytics, tracking, and remote reporting features.\n- **Lightweight:** Smaller APK size due to removed libraries.\n- **Feature Note:** Account settings and menu error reporting are disabled in this version." >> release_notes.md
 
       - name: Create GitHub Release
-        if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag_name }}
-          name: Release ${{ github.event.inputs.tag_name }}
+          tag_name: ${{ github.event.inputs.tag_name || format('v{0}', github.sha) }}
+          name: ${{ github.event.inputs.tag_name && format('Release {0}', github.event.inputs.tag_name) || format('Release {0}', github.sha) }}
           body_path: release_notes.md
-          files: app/build/outputs/apk/full/release/cuk밥-full-release.apk
+          files: |
+            app/build/outputs/apk/full/release/cuk밥-full-release.apk
+            app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

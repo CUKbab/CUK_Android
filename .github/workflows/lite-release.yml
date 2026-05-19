@@ -1,17 +1,14 @@
-name: Lite Version Release
+name: Lite Version Build
 
 on:
   push:
     branches:
-      - main
       - dev
   workflow_dispatch:
 
 jobs:
   build-lite:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - uses: actions/checkout@v6
@@ -53,25 +50,12 @@ jobs:
           keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "34.0.0"
+
       - name: Rename Signed APK
         run: mv ${{ steps.sign_app.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
-      - name: Get Version Name
-        id: get_version
-        run: |
-          VERSION_NAME=$(grep "versionName =" app/build.gradle.kts | cut -d'"' -f2)
-          echo "version=$VERSION_NAME" >> $GITHUB_OUTPUT
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}-lite
-          name: CUKbab Lite v${{ steps.get_version.outputs.version }}
-          body: |
-            ## CUKbab Lite Edition
-            This is an open-source friendly version of CUKbab with the following changes:
-            - **No Firebase:** Completely removed Google Firebase and Google Services dependencies.
-            - **Privacy Focused:** Removed all analytics, tracking, and remote reporting features.
-            - **Lightweight:** Smaller APK size due to removed libraries.
-            - **Feature Note:** Account settings and menu error reporting are disabled in this version.
-          files: app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: cuk밥-lite-release
+          path: app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
