@@ -43,12 +43,14 @@ android {
         create("full") {
             dimension = "version"
             buildConfigField("Boolean", "SHOW_AUTH_FEATURES", "true")
+            resValue("string", "app_name_flavor", "CUK밥")
         }
         create("lite") {
             dimension = "version"
             applicationIdSuffix = ".lite"
             versionNameSuffix = "-lite"
             buildConfigField("Boolean", "SHOW_AUTH_FEATURES", "false")
+            resValue("string", "app_name_flavor", "CUK밥-lite")
         }
     }
 

@@ -53,13 +53,13 @@ jobs:
           keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "34.0.0"
-
+      - name: Rename Signed APK
+        run: mv ${{ steps.sign_app.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
       - name: Get Version Name
         id: get_version
         run: |
           VERSION_NAME=$(grep "versionName =" app/build.gradle.kts | cut -d'"' -f2)
           echo "version=$VERSION_NAME" >> $GITHUB_OUTPUT
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -72,6 +72,6 @@ jobs:
             - **Privacy Focused:** Removed all analytics, tracking, and remote reporting features.
             - **Lightweight:** Smaller APK size due to removed libraries.
             - **Feature Note:** Account settings and menu error reporting are disabled in this version.
-          files: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          files: app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
