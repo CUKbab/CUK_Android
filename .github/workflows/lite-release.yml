@@ -1,4 +1,4 @@
-name: Lite Version Build
+name: Dev Branch Build Verification
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-lite:
+  build-variants:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +27,10 @@ jobs:
       - name: Add build-tools to $PATH
         run: echo "$ANDROID_HOME/build-tools/34.0.0" >> "$GITHUB_PATH"
 
+      - name: Create google-services.json
+        # The Full version still needs this to compile on dev
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
@@ -35,15 +39,16 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build Lite Release APK
-        # Pass -PisLite=true to disable Google Services plugin in build.gradle.kts
-        run: ./gradlew assembleLiteRelease -PisLite=true
+      - name: Build Both Variants
+        run: |
+          ./gradlew assembleFullRelease
+          ./gradlew assembleLiteRelease -PisLite=true
 
-      - name: Sign Lite APK
+      - name: Sign APKs
         uses: r0adkll/sign-android-release@v1
         id: sign_app
         with:
-          releaseDirectory: app/build/outputs/apk/lite/release
+          releaseDirectory: app/build/outputs/apk/
           signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
@@ -51,10 +56,23 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Rename Signed APK
-        run: mv ${{ steps.sign_app.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
+      - name: Rename and Prepare Artifacts
+        run: |
+          # Find and rename the signed full APK
+          FULL_SIGNED=$(find app/build/outputs/apk/full/release -name "*-signed.apk")
+          mv "$FULL_SIGNED" app/build/outputs/apk/full/release/cuk밥-full-release.apk
+          
+          # Find and rename the signed lite APK
+          LITE_SIGNED=$(find app/build/outputs/apk/lite/release -name "*-signed.apk")
+          mv "$LITE_SIGNED" app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
 
-      - name: Upload APK Artifact
+      - name: Upload Full APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cuk밥-full-release
+          path: app/build/outputs/apk/full/release/cuk밥-full-release.apk
+
+      - name: Upload Lite APK
         uses: actions/upload-artifact@v4
         with:
           name: cuk밥-lite-release
