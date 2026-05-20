@@ -6,11 +6,6 @@ plugins {
     id("com.google.android.gms.oss-licenses-plugin")
 }
 
-// Conditionally apply Google Services plugin only for non-lite builds
-if (project.findProperty("isLite") != "true") {
-    apply(plugin = "com.google.gms.google-services")
-}
-
 android {
     namespace = "com.cukbab"
     compileSdk = 36
@@ -33,9 +28,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "ADMIN_EMAIL", "\"${keystoreProperties["adminEmail"] ?: ""}\"")
-        buildConfigField("String", "REPORTER_BASE_URL", "\"${keystoreProperties["reporterBaseUrl"] ?: ""}\"")
-        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${keystoreProperties["googleClientId"] ?: ""}\"")
+        buildConfigField("String", "ADMIN_EMAIL", "\"${project.findProperty("adminEmail") ?: keystoreProperties["adminEmail"] ?: ""}\"")
+        buildConfigField("String", "REPORTER_BASE_URL", "\"${project.findProperty("reporterBaseUrl") ?: keystoreProperties["reporterBaseUrl"] ?: ""}\"")
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${project.findProperty("googleClientId") ?: keystoreProperties["googleClientId"] ?: ""}\"")
     }
 
     flavorDimensions += "version"
@@ -57,10 +52,10 @@ android {
     signingConfigs {
       if (hasKeystore) {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String?
+            keyAlias = (project.findProperty("keyAlias") ?: keystoreProperties["keyAlias"] ?: keystoreProperties["RELEASE_KEY_ALIAS"]) as String?
+            keyPassword = (project.findProperty("keyPassword") ?: keystoreProperties["keyPassword"] ?: keystoreProperties["RELEASE_KEY_PASSWORD"]) as String?
+            storeFile = (project.findProperty("storeFile") ?: keystoreProperties["storeFile"])?.let { file(it) }
+            storePassword = (project.findProperty("storePassword") ?: keystoreProperties["storePassword"] ?: keystoreProperties["RELEASE_STORE_PASSWORD"]) as String?
         }
       }
     }
@@ -140,4 +135,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.play.services.oss.licenses)
+}
+
+// Conditionally apply Google Services plugin at the bottom for better compatibility
+if (project.findProperty("isLite") != "true") {
+    apply(plugin = "com.google.gms.google-services")
 }

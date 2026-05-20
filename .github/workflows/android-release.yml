@@ -47,8 +47,14 @@ jobs:
 
       - name: Build Variants
         run: |
-          ./gradlew assembleFullRelease
-          ./gradlew assembleLiteRelease -PisLite=true
+          ./gradlew assembleFullRelease \
+            -PadminEmail="${{ secrets.ADMIN_EMAIL }}" \
+            -PreporterBaseUrl="${{ secrets.REPORTER_BASE_URL }}" \
+            -PgoogleClientId="${{ secrets.GOOGLE_CLIENT_ID }}"
+          ./gradlew assembleLiteRelease -PisLite=true \
+            -PadminEmail="${{ secrets.ADMIN_EMAIL }}" \
+            -PreporterBaseUrl="${{ secrets.REPORTER_BASE_URL }}" \
+            -PgoogleClientId="${{ secrets.GOOGLE_CLIENT_ID }}"
 
       - name: Sign Full APK
         uses: r0adkll/sign-android-release@v1
