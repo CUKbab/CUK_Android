@@ -38,11 +38,9 @@ fun MenuCard(category: String, menu: String, date: String) {
     val notificationScheduledMsg = stringResource(R.string.notification_scheduled)
     val notificationCancelledMsg = stringResource(R.string.notification_cancelled)
 
-    Card(
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -85,7 +83,8 @@ fun MenuCard(category: String, menu: String, date: String) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = menu,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
             )
         }
     }

@@ -41,20 +41,10 @@ fun WidgetSettingsScreen(onBack: () -> Unit) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
-        TextButton(
-            onClick = onBack,
-            modifier = Modifier.padding(bottom = 8.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.back))
-        }
-
         Text(
             text = stringResource(R.string.widget_settings),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
         )
 
         Text(

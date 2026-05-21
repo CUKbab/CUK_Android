@@ -11,14 +11,13 @@ import androidx.compose.ui.platform.LocalContext
 import com.cukbab.R
 import com.cukbab.LanguagePreference
 import com.cukbab.data.AppVersion
-import com.cukbab.data.TutorialRepository
-import com.cukbab.ui.components.AnimatedTutorialOverlay
-import com.cukbab.ui.components.TutorialStep
 import com.cukbab.ui.screens.settings.*
 import com.cukbab.ui.theme.ThemePreference
 
 @Composable
 fun SettingsScreen(
+    currentSubMenu: SettingsSubMenu?,
+    onSubMenuChange: (SettingsSubMenu?) -> Unit,
     themePreference: ThemePreference,
     onThemeChange: (ThemePreference) -> Unit,
     baseFontSize: Float,
@@ -38,8 +37,6 @@ fun SettingsScreen(
     onNotifCoordsMeasured: (LayoutCoordinates) -> Unit,
     onFeedbackCoordsMeasured: (LayoutCoordinates) -> Unit
 ) {
-    var currentSubMenu by remember { mutableStateOf<SettingsSubMenu?>(null) }
-
     AnimatedContent(
         targetState = currentSubMenu,
         transitionSpec = {
@@ -53,27 +50,27 @@ fun SettingsScreen(
     ) { subMenu ->
         when (subMenu) {
             null, SettingsSubMenu.Main -> SettingsMainScreen(
-                onNavigate = { currentSubMenu = it },
+                onNavigate = { onSubMenuChange(it) },
                 onShowChangelog = onShowChangelog,
                 onDisplayCoordsMeasured = onDisplayCoordsMeasured,
                 onWidgetCoordsMeasured = onWidgetCoordsMeasured,
                 onNotifCoordsMeasured = onNotifCoordsMeasured,
                 onFeedbackCoordsMeasured = onFeedbackCoordsMeasured
             )
-            SettingsSubMenu.Account -> AccountSettingsScreen(onBack = { currentSubMenu = null })
+            SettingsSubMenu.Account -> AccountSettingsScreen(onBack = { onSubMenuChange(null) })
             SettingsSubMenu.Display -> DisplaySettingsScreen(
                 themePreference, onThemeChange, baseFontSize, onFontSizeChange,
                 showOperatingHours, onShowOperatingHoursChange,
                 experimentalDualPane, onExperimentalDualPaneChange,
                 languagePreference, onLanguageChange,
                 customAccentColor, onAccentColorChange,
-                onBack = { currentSubMenu = null }
+                onBack = { onSubMenuChange(null) }
             )
-            SettingsSubMenu.Widget -> WidgetSettingsScreen(onBack = { currentSubMenu = null })
-            SettingsSubMenu.Notifications -> NotificationSettingsScreen(onBack = { currentSubMenu = null })
-            SettingsSubMenu.Admin -> AdminPanelScreen(onBack = { currentSubMenu = null })
+            SettingsSubMenu.Widget -> WidgetSettingsScreen(onBack = { onSubMenuChange(null) })
+            SettingsSubMenu.Notifications -> NotificationSettingsScreen(onBack = { onSubMenuChange(null) })
+            SettingsSubMenu.Admin -> AdminPanelScreen(onBack = { onSubMenuChange(null) })
             SettingsSubMenu.About -> AboutSettingsScreen(
-                onBack = { currentSubMenu = null },
+                onBack = { onSubMenuChange(null) },
                 onUpdateFound = onUpdateFound
             )
         }

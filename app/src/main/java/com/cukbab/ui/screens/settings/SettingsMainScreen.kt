@@ -227,18 +227,30 @@ fun SettingsMainScreen(
         if (!ReportPreferences.hasAgreedToPolicy(context)) {
             showPolicyDialog = true
         } else {
-            ReportDialog(
-                reportType = showDialog!!,
-                onDismiss = { showDialog = null },
-                onSubmit = { title, body ->
+            if (showDialog == ReportType.MenuError) {
+                // Auto-submit for Menu Error
+                LaunchedEffect(Unit) {
                     submitReport(
-                        title = title,
-                        body = body,
-                        labels = listOf("reported-via-app", showDialog!!.label)
+                        title = "Menu Error",
+                        body = "Menu Error",
+                        labels = listOf("reported-via-app", "menu-error")
                     )
                     showDialog = null
                 }
-            )
+            } else {
+                ReportDialog(
+                    reportType = showDialog!!,
+                    onDismiss = { showDialog = null },
+                    onSubmit = { title, body ->
+                        submitReport(
+                            title = title,
+                            body = body,
+                            labels = listOf("reported-via-app", showDialog!!.label)
+                        )
+                        showDialog = null
+                    }
+                )
+            }
         }
     }
 

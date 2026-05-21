@@ -59,16 +59,28 @@ fun CUKbabTheme(
             if (darkTheme) {
                 darkColorScheme(
                     primary = customAccentColor,
-                    secondary = customAccentColor,
+                    onPrimary = Color.Black,
                     primaryContainer = customAccentColor.copy(alpha = 0.3f),
+                    onPrimaryContainer = Color.White,
+                    secondary = customAccentColor.copy(alpha = 0.8f),
+                    onSecondary = Color.Black,
                     secondaryContainer = customAccentColor.copy(alpha = 0.2f),
+                    onSecondaryContainer = Color.White,
+                    surfaceVariant = customAccentColor.copy(alpha = 0.1f),
+                    onSurfaceVariant = Color.White
                 )
             } else {
                 lightColorScheme(
                     primary = customAccentColor,
-                    secondary = customAccentColor,
-                    primaryContainer = customAccentColor.copy(alpha = 0.1f),
-                    secondaryContainer = customAccentColor.copy(alpha = 0.15f),
+                    onPrimary = Color.White,
+                    primaryContainer = customAccentColor.copy(alpha = 0.15f),
+                    onPrimaryContainer = customAccentColor,
+                    secondary = customAccentColor.copy(alpha = 0.7f),
+                    onSecondary = Color.White,
+                    secondaryContainer = customAccentColor.copy(alpha = 0.1f),
+                    onSecondaryContainer = customAccentColor,
+                    surfaceVariant = customAccentColor.copy(alpha = 0.05f),
+                    onSurfaceVariant = Color.Black
                 )
             }
         }

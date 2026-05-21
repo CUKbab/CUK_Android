@@ -10,10 +10,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import com.cukbab.ui.components.AnnouncementBottomSheet
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
@@ -43,6 +48,7 @@ import com.cukbab.ui.screens.BuonPranzoScreen
 import com.cukbab.ui.screens.CafeBonaScreen
 import com.cukbab.ui.screens.SettingsScreen
 import com.cukbab.ui.theme.ThemePreference
+import com.cukbab.ui.screens.settings.SettingsSubMenu
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +73,7 @@ sealed class MenuUiState {
 
 val screenList = listOf(Screen.BuonPranzo, Screen.CafeBona, Screen.Settings)
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CUKbabApp(
     windowWidthSizeClass: WindowWidthSizeClass,
@@ -85,13 +92,15 @@ fun CUKbabApp(
     onUpdateFound: (AppVersion) -> Unit
 ) {
     var selectedScreen by remember { mutableStateOf<Screen>(Screen.BuonPranzo) }
+    var currentSubMenu by remember { mutableStateOf<SettingsSubMenu?>(null) }
+    var showAnnouncements by remember { mutableStateOf(false) }
     var uiState by remember { mutableStateOf<MenuUiState>(MenuUiState.Loading) }
     
     val initialDate = remember {
         val today = LocalDate.now()
         when (today.dayOfWeek) {
-            DayOfWeek.SATURDAY -> today.plusDays(2)
-            DayOfWeek.SUNDAY -> today.plusDays(1)
+            DayOfWeek.SATURDAY -> today.minusDays(5)
+            DayOfWeek.SUNDAY -> today.minusDays(6)
             else -> today
         }
     }
@@ -232,8 +241,56 @@ fun CUKbabApp(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             if (windowWidthSizeClass == WindowWidthSizeClass.Compact) {
+                val topAppBarState = rememberSaveable(selectedScreen, currentSubMenu, saver = TopAppBarState.Saver) {
+                    TopAppBarState(0f, 0f, 0f)
+                }
+                val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState)
+                
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        if (!isDualPaneEnabled) {
+                            CenterAlignedTopAppBar(
+                                title = {
+                                    val title = if (selectedScreen == Screen.Settings && currentSubMenu != null) {
+                                        when (currentSubMenu) {
+                                            SettingsSubMenu.Account -> stringResource(R.string.account_settings)
+                                            SettingsSubMenu.Display -> stringResource(R.string.display_settings)
+                                            SettingsSubMenu.Notifications -> stringResource(R.string.notification_settings)
+                                            SettingsSubMenu.Admin -> stringResource(R.string.admin_panel)
+                                            SettingsSubMenu.Widget -> stringResource(R.string.widget_settings)
+                                            SettingsSubMenu.About -> stringResource(R.string.about)
+                                            else -> stringResource(selectedScreen.labelRes)
+                                        }
+                                    } else {
+                                        stringResource(selectedScreen.labelRes)
+                                    }
+                                    Text(
+                                        text = title,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                navigationIcon = {
+                                    if (selectedScreen == Screen.Settings && currentSubMenu != null) {
+                                        IconButton(onClick = { currentSubMenu = null }) {
+                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                                        }
+                                    }
+                                },
+                                actions = {
+                                    if (selectedScreen != Screen.Settings) {
+                                        IconButton(onClick = { refreshMenu(true, selectedDate) }) {
+                                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                                        }
+                                    }
+                                },
+                                scrollBehavior = scrollBehavior
+                            )
+                        }
+                    },
                     bottomBar = {
                         if (!isDualPaneEnabled) {
                             NavigationBar {
@@ -243,7 +300,10 @@ fun CUKbabApp(
                                         icon = { Icon(screen.icon, contentDescription = label) },
                                         label = { Text(label) },
                                         selected = selectedScreen == screen,
-                                        onClick = { selectedScreen = screen }
+                                        onClick = { 
+                                            selectedScreen = screen
+                                            currentSubMenu = null
+                                        }
                                     )
                                 }
                             }
@@ -262,6 +322,8 @@ fun CUKbabApp(
 
                     AnimatedContentArea(
                         selectedScreen,
+                        currentSubMenu,
+                        onSubMenuChange = { currentSubMenu = it },
                         menuData,
                         isLoading,
                         isRefreshing,
@@ -330,6 +392,8 @@ fun CUKbabApp(
 
                     AnimatedContentArea(
                         selectedScreen,
+                        currentSubMenu,
+                        onSubMenuChange = { currentSubMenu = it },
                         menuData,
                         isLoading,
                         isRefreshing,
@@ -398,6 +462,10 @@ fun CUKbabApp(
         }
     }
 
+    if (showAnnouncements) {
+        AnnouncementBottomSheet(onDismiss = { showAnnouncements = false })
+    }
+
     if (showChangelog) {
         val currentLang = if (languagePreference.tag.isEmpty()) {
             java.util.Locale.getDefault().language
@@ -418,6 +486,8 @@ fun CUKbabApp(
 @Composable
 fun AnimatedContentArea(
     screen: Screen,
+    currentSubMenu: SettingsSubMenu?,
+    onSubMenuChange: (SettingsSubMenu?) -> Unit,
     menuData: MenuData?,
     isLoading: Boolean,
     isRefreshing: Boolean,
@@ -467,6 +537,8 @@ fun AnimatedContentArea(
     ) { targetScreen ->
         ContentArea(
             targetScreen, 
+            currentSubMenu,
+            onSubMenuChange,
             menuData, 
             isLoading, 
             isRefreshing, 
@@ -502,9 +574,12 @@ fun AnimatedContentArea(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ContentArea(
     screen: Screen,
+    currentSubMenu: SettingsSubMenu?,
+    onSubMenuChange: (SettingsSubMenu?) -> Unit,
     menuData: MenuData?,
     isLoading: Boolean,
     isRefreshing: Boolean,
@@ -551,13 +626,6 @@ fun ContentArea(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (!isDualPaneEnabled) {
-                Text(
-                    text = stringResource(screen.labelRes),
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                )
-
                 if (screen !is Screen.Settings) {
                     DateSelector(
                         selectedDate = selectedDate,
@@ -576,6 +644,7 @@ fun ContentArea(
                         menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
                     )
                     is Screen.Settings -> SettingsScreen(
+                        currentSubMenu, onSubMenuChange,
                         themePreference, onThemeChange, baseFontSize, onFontSizeChange, 
                         showOperatingHours, onShowOperatingHoursChange,
                         experimentalDualPane, onExperimentalDualPaneChange,
@@ -632,6 +701,7 @@ fun ContentArea(
                 if (screen is Screen.Settings) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         SettingsScreen(
+                            currentSubMenu, onSubMenuChange,
                             themePreference, onThemeChange, baseFontSize, onFontSizeChange, 
                             showOperatingHours, onShowOperatingHoursChange,
                             experimentalDualPane, onExperimentalDualPaneChange,
@@ -714,7 +784,8 @@ fun ChangelogDialog(language: String, onDismiss: () -> Unit) {
         text = {
             Box(modifier = Modifier.heightIn(max = 450.dp).fillMaxWidth()) {
                 if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+                    LoadingIndicator(modifier = Modifier.align(Alignment.Center))
                 } else {
                     val lines = changelogText?.split("\n") ?: listOf("No changelog available.")
                     Column(

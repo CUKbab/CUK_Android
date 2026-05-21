@@ -39,6 +39,7 @@
     <string name="back">Back</string>
     <string name="whats_new">What\'s New!</string>
     <string name="about">About</string>
+    <string name="announcements">Announcements</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="close">Close</string>
     <string name="min">min</string>
@@ -130,7 +131,7 @@
     <string name="update">Update</string>
     <string name="version_label">Version %s</string>
     <string name="license_info">Open Source Licenses</string>
-    <string name="source_code">Menu Parser (Source)</string>
+    <string name="source_code">App Source Code</string>
     <string name="privacy_policy">Privacy Policy</string>
 
     <!-- Tutorial -->

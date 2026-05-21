@@ -89,6 +89,7 @@ fun SettingsMenuItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FeedbackButton(
     text: String,
@@ -107,9 +108,8 @@ fun FeedbackButton(
         shape = RoundedCornerShape(12.dp)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(
+            LoadingIndicator(
                 modifier = Modifier.size(20.dp),
-                strokeWidth = 2.dp,
                 color = MaterialTheme.colorScheme.primary
             )
         } else {

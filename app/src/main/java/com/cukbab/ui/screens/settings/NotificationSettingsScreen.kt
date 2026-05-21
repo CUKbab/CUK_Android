@@ -90,16 +90,6 @@ fun NotificationSettingsScreen(onBack: () -> Unit) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
-        TextButton(
-            onClick = onBack,
-            modifier = Modifier.padding(bottom = 8.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.back))
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
             Card(
                 modifier = Modifier

@@ -66,13 +66,19 @@ class MenuWidget : GlanceAppWidget() {
             val categoryDisplay = getCategoryDisplayName(context, category)
             val headerTitle = "$cafeteria\n$categoryDisplay"
             
-            val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            val todayDate = LocalDate.now()
+            val queryDate = when (todayDate.dayOfWeek) {
+                java.time.DayOfWeek.SATURDAY -> todayDate.minusDays(5)
+                java.time.DayOfWeek.SUNDAY -> todayDate.minusDays(6)
+                else -> todayDate
+            }
+            val today = queryDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             val nowTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
             var menuText = "No menu data."
             try {
                 val menuData = withContext(Dispatchers.IO) {
-                    com.cukbab.data.MenuRepository.getMenu(context, LocalDate.now())
+                    com.cukbab.data.MenuRepository.getMenu(context, queryDate)
                 }
                 val rawMenu = menuData[jsonKey]?.get(today) ?: "No Menu"
                 menuText = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) "No menu for today." else rawMenu

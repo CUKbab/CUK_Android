@@ -33,12 +33,6 @@ fun AdminPanelScreen(onBack: () -> Unit) {
     BackHandler(onBack = onBack)
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TextButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.back))
-        }
-
         PrimaryTabRow(selectedTabIndex = selectedTab) {
             tabs.forEachIndexed { index, title ->
                 Tab(
@@ -56,6 +50,7 @@ fun AdminPanelScreen(onBack: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ReportsTab() {
     val reportsFlow = remember { ReporterClient.getAllReports() }
@@ -65,7 +60,7 @@ private fun ReportsTab() {
 
     if (result.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            LoadingIndicator()
         }
     } else if (result.error != null) {
         Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
@@ -106,6 +101,7 @@ private fun ReportsTab() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BlockedUsersTab() {
     val usersFlow = remember { ReporterClient.getAllBlockedUsers() }
@@ -115,7 +111,7 @@ private fun BlockedUsersTab() {
 
     if (result.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            LoadingIndicator()
         }
     } else if (result.error != null) {
         Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {

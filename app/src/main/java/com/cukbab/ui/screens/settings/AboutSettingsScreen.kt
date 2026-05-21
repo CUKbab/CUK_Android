@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
@@ -51,130 +50,122 @@ fun AboutSettingsScreen(onBack: () -> Unit, onUpdateFound: (AppVersion) -> Unit)
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        TextButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.back))
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // App Icon
+        Surface(
+            modifier = Modifier.size(100.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant
+        ) {
+            AndroidView(
+                factory = { ctx ->
+                    ImageView(ctx).apply {
+                        setImageResource(R.mipmap.ic_launcher)
+                    }
+                },
+                modifier = Modifier.padding(16.dp)
+            )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = stringResource(R.string.version_label, versionName ?: "Unknown"),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        // Update Section
+        Text(
+            text = stringResource(R.string.update),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, bottom = 8.dp)
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
         ) {
-            // App Icon
-            Surface(
-                modifier = Modifier.size(100.dp),
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
-            ) {
-                AndroidView(
-                    factory = { ctx ->
-                        ImageView(ctx).apply {
-                            setImageResource(R.mipmap.ic_launcher)
-                        }
-                    },
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = stringResource(R.string.version_label, versionName ?: "Unknown"),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(Modifier.height(32.dp))
-
-            // Update Section
-            Text(
-                text = stringResource(R.string.update),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, bottom = 8.dp)
-            )
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            ) {
-                AboutItem(
-                    icon = if (isCheckingUpdates) Icons.Default.Sync else Icons.Default.Update,
-                    title = stringResource(R.string.check_for_updates),
-                    onClick = {
-                        if (!isCheckingUpdates) {
-                            scope.launch {
-                                isCheckingUpdates = true
-                                val update = VersionRepository.checkForUpdate(context)
-                                if (update == null) {
-                                    Toast.makeText(context, R.string.on_latest_version, Toast.LENGTH_SHORT).show()
-                                } else {
-                                    onUpdateFound(update)
-                                }
-                                isCheckingUpdates = false
+            AboutItem(
+                icon = if (isCheckingUpdates) Icons.Default.Sync else Icons.Default.Update,
+                title = stringResource(R.string.check_for_updates),
+                onClick = {
+                    if (!isCheckingUpdates) {
+                        scope.launch {
+                            isCheckingUpdates = true
+                            val update = VersionRepository.checkForUpdate(context)
+                            if (update == null) {
+                                Toast.makeText(context, R.string.on_latest_version, Toast.LENGTH_SHORT).show()
+                            } else {
+                                onUpdateFound(update)
                             }
+                            isCheckingUpdates = false
                         }
+                    }
+                }
+            )
+        }
+
+        // Info Sections
+        Text(
+            text = "Information",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, bottom = 8.dp)
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                AboutItem(
+                    icon = Icons.Default.Description,
+                    title = stringResource(R.string.license_info),
+                    onClick = {
+                        context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                    }
+                )
+                
+                AboutItem(
+                    icon = Icons.Default.Policy,
+                    title = stringResource(R.string.privacy_policy),
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, "https://cukbab.github.io/CUK_Menu/privacy.html".toUri())
+                        context.startActivity(intent)
+                    }
+                )
+
+                AboutItem(
+                    icon = Icons.Default.Code,
+                    title = stringResource(R.string.source_code),
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, "https://github.com/CUKbab/CUK_Android".toUri())
+                        context.startActivity(intent)
                     }
                 )
             }
-
-            // Info Sections
-            Text(
-                text = "Information",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, bottom = 8.dp)
-            )
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    AboutItem(
-                        icon = Icons.Default.Description,
-                        title = stringResource(R.string.license_info),
-                        onClick = {
-                            context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
-                        }
-                    )
-                    
-                    AboutItem(
-                        icon = Icons.Default.Policy,
-                        title = stringResource(R.string.privacy_policy),
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, "https://cukbab.github.io/CUK_Menu/privacy.html".toUri())
-                            context.startActivity(intent)
-                        }
-                    )
-
-                    AboutItem(
-                        icon = Icons.Default.Code,
-                        title = stringResource(R.string.source_code),
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, "https://github.com/CUKbab/CUK_Menu".toUri())
-                            context.startActivity(intent)
-                        }
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            Text(
-                text = "© 2026 CUK밥",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
+
+        Spacer(Modifier.height(32.dp))
+
+        Text(
+            text = "© 2026 CUK밥",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

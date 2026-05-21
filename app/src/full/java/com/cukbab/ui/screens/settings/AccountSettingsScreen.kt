@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
@@ -38,6 +37,7 @@ import kotlinx.coroutines.tasks.await
 
 import com.cukbab.BuildConfig
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AccountSettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
@@ -90,96 +90,87 @@ fun AccountSettingsScreen(onBack: () -> Unit) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        TextButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.back))
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (currentUser != null) {
+            if (currentUser?.photoUrl != null) {
+                AsyncImage(
+                    model = currentUser?.photoUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    Icons.Default.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.logged_in_as, currentUser?.displayName ?: "User"),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = currentUser?.email ?: "",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(32.dp))
+            Button(
+                onClick = { AuthRepository.signOut() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.logout))
+            }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (currentUser != null) {
-                if (currentUser?.photoUrl != null) {
-                    AsyncImage(
-                        model = currentUser?.photoUrl,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
+            Spacer(Modifier.height(12.dp))
+
+            TextButton(
+                onClick = { showDeleteConfirm = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.delete_account))
+            }
+        } else {
+            Text(
+                text = stringResource(R.string.login_to_access),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+            Button(
+                onClick = { 
+                    scope.launch { handleSignIn() }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoggingIn,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                if (isLoggingIn) {
+                    LoadingIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Icon(
-                        Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = stringResource(R.string.logged_in_as, currentUser?.displayName ?: "User"),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = currentUser?.email ?: "",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(32.dp))
-                Button(
-                    onClick = { AuthRepository.signOut() },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.Login, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.logout))
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                TextButton(
-                    onClick = { showDeleteConfirm = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.delete_account))
-                }
-            } else {
-                Text(
-                    text = stringResource(R.string.login_to_access),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
-                Button(
-                    onClick = { 
-                        scope.launch { handleSignIn() }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !isLoggingIn,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    if (isLoggingIn) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Icon(Icons.AutoMirrored.Filled.Login, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.login_with_google))
-                    }
+                    Text(stringResource(R.string.login_with_google))
                 }
             }
         }

@@ -56,20 +56,10 @@ fun DisplaySettingsScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
-        TextButton(
-            onClick = onBack,
-            modifier = Modifier.padding(bottom = 8.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.back))
-        }
-
         Text(
             text = stringResource(R.string.theme_selection),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp, top = 8.dp)
         )
 
         SingleChoiceSegmentedButtonRow(
