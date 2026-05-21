@@ -282,6 +282,9 @@ fun CUKbabApp(
                                 },
                                 actions = {
                                     if (selectedScreen != Screen.Settings) {
+                                        IconButton(onClick = { showAnnouncements = true }) {
+                                            Icon(Icons.Default.Campaign, contentDescription = stringResource(R.string.announcements))
+                                        }
                                         IconButton(onClick = { refreshMenu(true, selectedDate) }) {
                                             Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
                                         }
@@ -346,6 +349,7 @@ fun CUKbabApp(
                         onAccentColorChange,
                         onUpdateFound = onUpdateFound,
                         onShowChangelog = { showChangelog = true },
+                        onShowAnnouncements = { showAnnouncements = true },
                         onCalendarCoordsMeasured = { calendarCoords = it },
                         onDisplayCoordsMeasured = { displayCoords = it },
                         onWidgetCoordsMeasured = { widgetCoords = it },
@@ -363,8 +367,13 @@ fun CUKbabApp(
                         NavigationRail(
                             modifier = Modifier.systemBarsPadding(),
                             header = {
-                                IconButton(onClick = { refreshMenu(true, selectedDate) }) {
-                                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    IconButton(onClick = { showAnnouncements = true }) {
+                                        Icon(Icons.Default.Campaign, contentDescription = stringResource(R.string.announcements))
+                                    }
+                                    IconButton(onClick = { refreshMenu(true, selectedDate) }) {
+                                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                                    }
                                 }
                             }
                         ) {
@@ -416,6 +425,7 @@ fun CUKbabApp(
                         onAccentColorChange,
                         onUpdateFound = onUpdateFound,
                         onShowChangelog = { showChangelog = true },
+                        onShowAnnouncements = { showAnnouncements = true },
                         onCalendarCoordsMeasured = { calendarCoords = it },
                         onDisplayCoordsMeasured = { displayCoords = it },
                         onWidgetCoordsMeasured = { widgetCoords = it },
@@ -510,6 +520,7 @@ fun AnimatedContentArea(
     onAccentColorChange: (androidx.compose.ui.graphics.Color?) -> Unit,
     onUpdateFound: (AppVersion) -> Unit,
     onShowChangelog: () -> Unit,
+    onShowAnnouncements: () -> Unit,
     onCalendarCoordsMeasured: (LayoutCoordinates) -> Unit,
     onDisplayCoordsMeasured: (LayoutCoordinates) -> Unit,
     onWidgetCoordsMeasured: (LayoutCoordinates) -> Unit,
@@ -561,6 +572,7 @@ fun AnimatedContentArea(
             onAccentColorChange,
             onUpdateFound,
             onShowChangelog,
+            onShowAnnouncements,
             onCalendarCoordsMeasured,
             onDisplayCoordsMeasured,
             onWidgetCoordsMeasured,
@@ -602,6 +614,7 @@ fun ContentArea(
     onAccentColorChange: (androidx.compose.ui.graphics.Color?) -> Unit,
     onUpdateFound: (AppVersion) -> Unit,
     onShowChangelog: () -> Unit,
+    onShowAnnouncements: () -> Unit,
     onCalendarCoordsMeasured: (LayoutCoordinates) -> Unit,
     onDisplayCoordsMeasured: (LayoutCoordinates) -> Unit,
     onWidgetCoordsMeasured: (LayoutCoordinates) -> Unit,
@@ -678,6 +691,10 @@ fun ContentArea(
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = onRefresh) {
                             Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(onClick = onShowAnnouncements) {
+                            Icon(Icons.Default.Campaign, contentDescription = stringResource(R.string.announcements))
                         }
                     }
                     
