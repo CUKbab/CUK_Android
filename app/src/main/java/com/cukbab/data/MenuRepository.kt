@@ -34,6 +34,12 @@ interface MenuService {
     suspend fun getAnnouncements(
         @retrofit2.http.Path("lang") lang: String
     ): List<Announcement>
+
+    @GET("CUKbab/CUK/refs/heads/main/changelogs/{lang}/{version}.md")
+    suspend fun getChangelog(
+        @retrofit2.http.Path("lang") lang: String,
+        @retrofit2.http.Path("version") version: String
+    ): String
 }
 
 object RetrofitClient {

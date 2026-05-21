@@ -87,14 +87,9 @@ object ReporterClient {
         // No-op in lite version
     }
 
-    suspend fun fetchChangelog(lang: String): String? {
+    suspend fun fetchChangelog(lang: String, version: String): String? {
         return try {
-            val response = service.getChangelog(lang)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                null
-            }
+            RetrofitClient.menuService.getChangelog(lang, version)
         } catch (e: Exception) {
             null
         }

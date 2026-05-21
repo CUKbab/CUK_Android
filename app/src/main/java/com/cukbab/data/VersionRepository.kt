@@ -15,7 +15,7 @@ data class AppVersion(
 )
 
 interface VersionService {
-    @GET("CUKbab/CUK_Menu/refs/heads/main/version.json")
+    @GET("CUKbab/CUK/refs/heads/main/version.json")
     suspend fun getLatestVersion(): AppVersion
 }
 

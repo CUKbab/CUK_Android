@@ -10,8 +10,8 @@ object AnnouncementRepository {
         val lang = prefs.getString("language", "System") ?: "System"
         
         return when {
-            lang.startsWith("Korean") || lang.contains("ko") -> "kr"
-            lang.startsWith("Japanese") || lang.contains("ja") -> "jp"
+            lang.startsWith("Korean") || lang.contains("ko") -> "ko"
+            lang.startsWith("Japanese") || lang.contains("ja") -> "ja"
             lang.startsWith("Chinese") || lang.contains("zh") -> "zn"
             else -> "en"
         }

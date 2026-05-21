@@ -1,4 +1,4 @@
-name: CUKbab Release
+name: CUK밥 Release
 
 on:
   push:
@@ -85,19 +85,25 @@ jobs:
           mv ${{ steps.sign_full.outputs.signedReleaseFile }} app/build/outputs/apk/full/release/cuk밥-full-release.apk
           mv ${{ steps.sign_lite.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
 
+      - name: Get version name
+        id: get_version
+        run: |
+          VERSION=$(grep "versionName =" app/build.gradle.kts | awk -F'"' '{print $2}')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Fetch and Prepare Changelog
         run: |
           # Fetch the latest English changelog from the main CUK repo
           curl -s https://raw.githubusercontent.com/CUKbab/CUK/refs/heads/main/changelogs/en.md > release_notes.md
           
           # Append the Lite version explanation
-          echo -e "\n---\n## CUKbab Lite Edition\nThis is an open-source friendly version of CUKbab with the following changes:\n- **No Firebase:** Completely removed Google Firebase and Google Services dependencies.\n- **Privacy Focused:** Removed all analytics, tracking, and remote reporting features.\n- **Lightweight:** Smaller APK size due to removed libraries.\n- **Feature Note:** Account settings and menu error reporting are disabled in this version." >> release_notes.md
+          echo -e "\n---\n## CUK밥 Lite Edition\nThis is an open-source friendly version of CUK밥 with the following changes:\n- **No Firebase:** Completely removed Google Firebase and Google Services dependencies.\n- **Privacy Focused:** Removed all tracking, and remote reporting features.\n- **Lightweight:** Smaller APK size due to removed libraries.\n- **Feature Note:** Account settings and menu error reporting are disabled in this version." >> release_notes.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag_name || format('v{0}', github.sha) }}
-          name: ${{ github.event.inputs.tag_name && format('Release {0}', github.event.inputs.tag_name) || format('Release {0}', github.sha) }}
+          tag_name: ${{ github.event.inputs.tag_name || format('v{0}', steps.get_version.outputs.VERSION) }}
+          name: ${{ github.event.inputs.tag_name && format('Release {0}', github.event.inputs.tag_name) || format('Release {0}', steps.get_version.outputs.VERSION) }}
           body_path: release_notes.md
           files: |
             app/build/outputs/apk/full/release/cuk밥-full-release.apk

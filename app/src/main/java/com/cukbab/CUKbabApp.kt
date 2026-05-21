@@ -33,6 +33,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -775,18 +776,20 @@ fun ContentArea(
 
 @Composable
 fun ChangelogDialog(language: String, onDismiss: () -> Unit) {
+    val context = LocalContext.current
     var changelogText by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     
     val workerLang = when {
         language.startsWith("ko") -> "ko"
         language.startsWith("ja") -> "ja"
-        language.startsWith("zh") -> "zh"
+        language.startsWith("zh") -> "zn"
         else -> "en"
     }
 
     LaunchedEffect(Unit) {
-        changelogText = ReporterClient.fetchChangelog(workerLang)
+        val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "unknown"
+        changelogText = ReporterClient.fetchChangelog(workerLang, versionName)
         isLoading = false
     }
 
