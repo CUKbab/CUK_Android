@@ -34,7 +34,8 @@ fun AnnouncementBottomSheet(
 
     LaunchedEffect(Unit) {
         try {
-            announcementList = AnnouncementRepository.getAnnouncements()
+            val lang = AnnouncementRepository.getAnnouncementLang(context)
+            announcementList = AnnouncementRepository.getAnnouncements(lang)
             announcementList?.maxByOrNull { it.id }?.let {
                 AnnouncementPreferences.setLastAnnouncementId(context, it.id)
             }

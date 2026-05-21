@@ -20,7 +20,8 @@ class AnnouncementWorker(
             }
 
             // 1. Check for new announcements
-            val announcements = AnnouncementRepository.getAnnouncements()
+            val lang = AnnouncementRepository.getAnnouncementLang(applicationContext)
+            val announcements = AnnouncementRepository.getAnnouncements(lang)
             if (announcements.isNotEmpty()) {
                 val latest = announcements.maxByOrNull { it.id } ?: return@withContext Result.success()
                 val lastSeenId = AnnouncementPreferences.getLastAnnouncementId(applicationContext)

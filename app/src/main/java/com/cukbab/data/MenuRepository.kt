@@ -30,8 +30,10 @@ interface MenuService {
         @retrofit2.http.Path("week") week: Int
     ): Map<String, Map<String, String>>
 
-    @GET("CUKbab/CUK/refs/heads/main/announcements.json")
-    suspend fun getAnnouncements(): List<Announcement>
+    @GET("CUKbab/CUK/refs/heads/main/announcements/{lang}/announcements.json")
+    suspend fun getAnnouncements(
+        @retrofit2.http.Path("lang") lang: String
+    ): List<Announcement>
 }
 
 object RetrofitClient {

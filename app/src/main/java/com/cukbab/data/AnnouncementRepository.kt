@@ -1,13 +1,26 @@
 package com.cukbab.data
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object AnnouncementRepository {
-    suspend fun getAnnouncements(): List<Announcement> {
+    fun getAnnouncementLang(context: Context): String {
+        val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val lang = prefs.getString("language", "System") ?: "System"
+        
+        return when {
+            lang.startsWith("Korean") || lang.contains("ko") -> "kr"
+            lang.startsWith("Japanese") || lang.contains("ja") -> "jp"
+            lang.startsWith("Chinese") || lang.contains("zh") -> "zn"
+            else -> "en"
+        }
+    }
+
+    suspend fun getAnnouncements(lang: String): List<Announcement> {
         return withContext(Dispatchers.IO) {
             try {
-                RetrofitClient.menuService.getAnnouncements()
+                RetrofitClient.menuService.getAnnouncements(lang)
             } catch (e: Exception) {
                 emptyList()
             }
