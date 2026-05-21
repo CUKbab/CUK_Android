@@ -126,4 +126,9 @@
     <string name="tutorial_thank_you_desc">CUK밥을 다운로드하고 사용해 주셔서 감사합니다. 여러분의 캠퍼스 생활이 조금 더 편리해지길 바랍니다!</string>
     <string name="check_for_updates">업데이트 확인</string>
     <string name="on_latest_version">최신 버전을 사용 중입니다.</string>
+
+    <string name="menu_updated_title">식단 업데이트됨!</string>
+    <string name="menu_updated_desc">이번 주 식단이 새로운 정보로 업데이트되었습니다.</string>
+    <string name="announcement_notifications">공지사항 알림</string>
+    <string name="announcement_notifications_desc">새로운 공지사항 및 식단 업데이트 알림을 받습니다.</string>
 </resources>

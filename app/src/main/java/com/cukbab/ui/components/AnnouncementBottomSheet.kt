@@ -18,12 +18,15 @@ import androidx.compose.ui.unit.sp
 import com.cukbab.R
 import com.cukbab.data.Announcement
 import com.cukbab.data.AnnouncementRepository
+import com.cukbab.data.AnnouncementPreferences
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AnnouncementBottomSheet(
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var announcementList by remember { mutableStateOf<List<Announcement>?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -32,6 +35,9 @@ fun AnnouncementBottomSheet(
     LaunchedEffect(Unit) {
         try {
             announcementList = AnnouncementRepository.getAnnouncements()
+            announcementList?.maxByOrNull { it.id }?.let {
+                AnnouncementPreferences.setLastAnnouncementId(context, it.id)
+            }
         } catch (e: Exception) {
             error = e.localizedMessage
         } finally {

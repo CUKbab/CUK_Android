@@ -39,56 +39,9 @@ class NotificationReceiver : BroadcastReceiver() {
             }
             
             android.util.Log.d("NotificationReceiver", "Triggering notification: $displayTitle (ID: $notificationId)")
-            showNotification(context.applicationContext, displayTitle, menu, notificationId)
+            NotificationHelper.showNotification(context.applicationContext, displayTitle, menu, notificationId)
         } catch (e: Exception) {
             android.util.Log.e("NotificationReceiver", "Error in onReceive", e)
         }
-    }
-
-    private fun showNotification(context: Context, title: String, message: String, notificationId: Int) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "meal_reminders_v3" // Bumping to v3 to force fresh channel settings
-
-        val channel = NotificationChannel(
-            channelId,
-            context.getString(R.string.meal_reminders),
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Meal reminders and updates"
-            enableLights(true)
-            enableVibration(true)
-            setShowBadge(true)
-            lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-        }
-        notificationManager.createNotificationChannel(channel)
-
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-            .setPriority(NotificationCompat.PRIORITY_MAX) // Use MAX for strongest priority
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .build()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                return
-            }
-        }
-        notificationManager.notify(notificationId, notification)
-        android.util.Log.d("NotificationReceiver", "notificationManager.notify called for ID: $notificationId")
     }
 }

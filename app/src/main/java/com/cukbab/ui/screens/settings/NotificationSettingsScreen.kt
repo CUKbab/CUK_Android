@@ -215,5 +215,37 @@ fun NotificationSettingsScreen(onBack: () -> Unit) {
         )
         
         Spacer(modifier = Modifier.height(32.dp))
+
+        var announcementsEnabled by remember { 
+            mutableStateOf(NotificationPreferences.isAnnouncementsEnabled(context)) 
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.announcement_notifications),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = stringResource(R.string.announcement_notifications_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = announcementsEnabled,
+                onCheckedChange = { 
+                    announcementsEnabled = it
+                    NotificationPreferences.setAnnouncementsEnabled(context, it)
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

@@ -461,9 +461,10 @@ fun CUKbabApp(
                         TutorialRepository.setMainTutorialComplete(context)
                         TutorialRepository.setSettingsTutorialComplete(context)
                         isTutorialActive = false
+                        // Schedule announcement polling after tutorial
+                        AnnouncementWorker.schedule(context)
                         // Once tutorial is over, check if we need to show the changelog
-                        if (pendingChangelog) {
-                            showChangelog = true
+                        if (pendingChangelog) {                            showChangelog = true
                             pendingChangelog = false
                         }
                     }

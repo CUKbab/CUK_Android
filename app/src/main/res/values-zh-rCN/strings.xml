@@ -123,4 +123,9 @@
 
     <string name="check_for_updates">检查更新</string>
     <string name="on_latest_version">您已是最新版本。</string>
+
+    <string name="menu_updated_title">菜单已更新！</string>
+    <string name="menu_updated_desc">本周菜单已更新新信息。</string>
+    <string name="announcement_notifications">公告通知</string>
+    <string name="announcement_notifications_desc">接收新公告和菜单更新的通知。</string>
 </resources>

@@ -28,4 +28,14 @@ object MenuPreferences {
             putStringSet(KEY_COLLAPSED_GROUPS, current.map { it.toString() }.toSet())
         }
     }
+
+    fun getLastMenuHash(context: Context): Int {
+        return getPrefs(context).getInt("last_menu_hash", -1)
+    }
+
+    fun setLastMenuHash(context: Context, hash: Int) {
+        getPrefs(context).edit {
+            putInt("last_menu_hash", hash)
+        }
+    }
 }

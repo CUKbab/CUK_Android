@@ -65,7 +65,9 @@ object MenuRepository {
         return try {
             // 1. Try to fetch from latest.json first
             var rawData = withContext(Dispatchers.IO) {
-                RetrofitClient.menuService.getLatestMenu()
+                val latest = RetrofitClient.menuService.getLatestMenu()
+                MenuPreferences.setLastMenuHash(context, latest.hashCode())
+                latest
             }
 
             // 2. Check if latest.json actually contains the requested date

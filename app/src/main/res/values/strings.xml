@@ -152,4 +152,9 @@
     <string name="tutorial_thank_you_desc">Thank you for downloading and using CUK밥. We hope it makes your campus life a little bit easier!</string>
     <string name="check_for_updates">Check for Updates</string>
     <string name="on_latest_version">You are using the latest version.</string>
+
+    <string name="menu_updated_title">Menu Updated!</string>
+    <string name="menu_updated_desc">This week\'s menu has been updated with new information.</string>
+    <string name="announcement_notifications">Announcement Notifications</string>
+    <string name="announcement_notifications_desc">Receive notifications for new announcements and menu updates.</string>
 </resources>

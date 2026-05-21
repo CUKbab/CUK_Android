@@ -66,4 +66,12 @@ object NotificationPreferences {
         val filtered = scheduled.filter { it.split("|").last() >= today }.toSet()
         prefs.edit { putStringSet(KEY_SCHEDULED_ITEMS, filtered) }
     }
+
+    fun isAnnouncementsEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean("announcements_enabled", true)
+    }
+
+    fun setAnnouncementsEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit { putBoolean("announcements_enabled", enabled) }
+    }
 }

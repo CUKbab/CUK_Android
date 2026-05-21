@@ -24,6 +24,8 @@ import kotlinx.coroutines.launch
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
+import com.cukbab.data.AnnouncementWorker
+import com.cukbab.data.AnnouncementPreferences
 
 class MainActivity : AppCompatActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)

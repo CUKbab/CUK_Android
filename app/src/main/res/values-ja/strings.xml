@@ -123,4 +123,9 @@
 
     <string name="check_for_updates">アップデートを確認</string>
     <string name="on_latest_version">最新バージョンを使用しています。</string>
+
+    <string name="menu_updated_title">献立が更新されました！</string>
+    <string name="menu_updated_desc">今週の献立が新しい情報で更新されました。</string>
+    <string name="announcement_notifications">お知らせ通知</string>
+    <string name="announcement_notifications_desc">新しいお知らせや献立の更新通知を受け取ります。</string>
 </resources>
