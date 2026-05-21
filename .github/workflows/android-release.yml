@@ -93,8 +93,9 @@ jobs:
 
       - name: Fetch and Prepare Changelog
         run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
           # Fetch the latest English changelog from the main CUK repo
-          curl -s https://raw.githubusercontent.com/CUKbab/CUK/refs/heads/main/changelogs/en.md > release_notes.md
+          curl -s https://github.com/CUKbab/CUK/blob/main/changelogs/en/${VERSION}.md > release_notes.md
           
           # Append the Lite version explanation
           echo -e "\n---\n## CUK밥 Lite Edition\nThis is an open-source friendly version of CUK밥 with the following changes:\n- **No Firebase:** Completely removed Google Firebase and Google Services dependencies.\n- **Privacy Focused:** Removed all tracking, and remote reporting features.\n- **Lightweight:** Smaller APK size due to removed libraries.\n- **Feature Note:** Account settings and menu error reporting are disabled in this version." >> release_notes.md
