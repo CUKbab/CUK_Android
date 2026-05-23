@@ -1,7 +1,7 @@
 # CUK밥 (CUK-Android)
 
 [![Android CI](https://github.com/CUKbab/CUK_Android/actions/workflows/android-release.yml/badge.svg)](https://github.com/CUKbab/CUK_Android/actions/workflows/android-release.yml)
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/CUKbab/CUK_Android/releases)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](https://github.com/CUKbab/CUK_Android/releases)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://www.android.com/)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.3.10-purple.svg)](https://kotlinlang.org/)
 
