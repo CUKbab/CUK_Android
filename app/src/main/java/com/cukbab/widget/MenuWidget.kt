@@ -45,6 +45,8 @@ class MenuWidget : GlanceAppWidget() {
                 "Pranzo-Plus-Corner" -> context.getString(R.string.category_plus_corner)
                 "Pranzo-Dinner" -> context.getString(R.string.category_dinner)
                 "Bona-Rice-Bowl" -> context.getString(R.string.category_rice_bowl)
+                "Lunch" -> context.getString(R.string.group_lunch)
+                "Dinner" -> context.getString(R.string.category_dinner)
                 else -> category
             }
         }

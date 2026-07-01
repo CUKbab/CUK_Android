@@ -22,7 +22,9 @@ object MealNotificationManager {
         "Pranzo-Global-Noodle" to LocalTime.of(11, 30),
         "Pranzo-Plus-Corner" to LocalTime.of(11, 30),
         "Pranzo-Dinner" to LocalTime.of(17, 30),
-        "Bona-Rice-Bowl" to LocalTime.of(11, 30)
+        "Bona-Rice-Bowl" to LocalTime.of(11, 30),
+        "Lunch" to LocalTime.of(11, 30),
+        "Dinner" to LocalTime.of(17, 30)
     )
 
     fun scheduleNotification(context: Context, category: String, date: String, menu: String) {

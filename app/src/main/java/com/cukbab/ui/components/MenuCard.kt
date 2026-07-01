@@ -32,6 +32,8 @@ fun MenuCard(category: String, menu: String, date: String) {
         "Pranzo-Plus-Corner" -> stringResource(R.string.category_plus_corner)
         "Pranzo-Dinner" -> stringResource(R.string.category_dinner)
         "Bona-Rice-Bowl" -> stringResource(R.string.category_rice_bowl)
+        "Lunch" -> stringResource(R.string.group_lunch)
+        "Dinner" -> stringResource(R.string.category_dinner)
         else -> category
     }
 

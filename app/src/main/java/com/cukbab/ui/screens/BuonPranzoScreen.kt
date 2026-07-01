@@ -20,6 +20,20 @@ fun BuonPranzoScreen(
     val context = LocalContext.current
     var collapsedGroups by remember { mutableStateOf(MenuPreferences.getCollapsedGroups(context)) }
 
+    val hasOnlyLunchDinner = menuData != null && menuData.keys.isNotEmpty() && menuData.keys.all { it == "Lunch" || it == "Dinner" }
+    val groups = if (hasOnlyLunchDinner) {
+        mapOf(
+            R.string.group_lunch to listOf("Lunch"),
+            R.string.group_dinner to listOf("Dinner")
+        )
+    } else {
+        mapOf(
+            R.string.group_morning to listOf("Morning"),
+            R.string.group_lunch to listOf("Pranzo-Korean", "Pranzo-Global-Noodle", "Pranzo-Plus-Corner"),
+            R.string.group_dinner to listOf("Pranzo-Dinner")
+        )
+    }
+
     MenuList(
         menuData = menuData,
         isLoading = isLoading,
@@ -28,11 +42,7 @@ fun BuonPranzoScreen(
         error = error,
         today = dateString,
         showOperatingHours = showOperatingHours,
-        groups = mapOf(
-            R.string.group_morning to listOf("Morning"),
-            R.string.group_lunch to listOf("Pranzo-Korean", "Pranzo-Global-Noodle", "Pranzo-Plus-Corner"),
-            R.string.group_dinner to listOf("Pranzo-Dinner")
-        ),
+        groups = groups,
         collapsedGroups = collapsedGroups,
         onToggleGroup = { groupResId ->
             val isCurrentlyCollapsed = collapsedGroups.contains(groupResId)
