@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.cukbab.R
 
 import androidx.compose.material.icons.Icons
@@ -18,8 +19,18 @@ import android.widget.Toast
 import com.cukbab.data.MealNotificationManager
 import com.cukbab.data.NotificationPreferences
 
+/** Trailing "(914kcal)" on the menu text, e.g. "배추김치 (914kcal)". */
+private val kcalRegex = Regex("""\s*\((\d+)\s*kcal\)\s*$""", RegexOption.IGNORE_CASE)
+
+/** Splits the calorie note off the menu text: ("...배추김치", 914). */
+internal fun splitCalories(menu: String): Pair<String, Int?> {
+    val match = kcalRegex.find(menu) ?: return menu to null
+    return menu.removeRange(match.range).trimEnd() to match.groupValues[1].toIntOrNull()
+}
+
 @Composable
 fun MenuCard(category: String, menu: String, date: String) {
+    val (menuText, kcal) = remember(menu) { splitCalories(menu) }
     val context = LocalContext.current
     var isScheduled by remember(category, date) { 
         mutableStateOf(NotificationPreferences.isScheduled(context, category, date)) 
@@ -53,8 +64,27 @@ fun MenuCard(category: String, menu: String, date: String) {
                     text = categoryDisplay,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
+
+                Spacer(Modifier.weight(1f))
+
+                if (kcal != null) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.kcal_format, kcal),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                }
 
                 if (menu != stringResource(R.string.no_menu)) {
                     IconButton(
@@ -90,7 +120,7 @@ fun MenuCard(category: String, menu: String, date: String) {
             
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = menu,
+                text = menuText,
                 style = MaterialTheme.typography.bodyMedium,
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
             )

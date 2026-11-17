@@ -159,4 +159,5 @@
     <string name="back_to_this_week">返回本周</string>
     <string name="saved_menu_banner">离线：正在显示已保存的菜单。下拉即可刷新。</string>
     <string name="retry">重试</string>
+    <string name="kcal_format">%1$d 千卡</string>
 </resources>

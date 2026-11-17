@@ -185,4 +185,5 @@
     <string name="back_to_this_week">Back to this week</string>
     <string name="saved_menu_banner">Offline: showing the saved menu. Pull down to refresh.</string>
     <string name="retry">Retry</string>
+    <string name="kcal_format">%1$d kcal</string>
 </resources>
