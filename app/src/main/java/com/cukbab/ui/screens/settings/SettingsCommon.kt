@@ -29,6 +29,10 @@ enum class SettingsSubMenu {
 
 const val ADMIN_EMAIL = BuildConfig.ADMIN_EMAIL
 
+// Must match the Firestore rules for the `reports` collection.
+const val REPORT_TITLE_MAX = 200
+const val REPORT_BODY_MAX = 5000
+
 enum class ReportType(val label: String) {
     MenuError("menu-error"),
     Feature("feature"),
@@ -237,19 +241,22 @@ fun ReportDialog(
             Column {
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
+                    onValueChange = { title = it.take(REPORT_TITLE_MAX) },
                     label = { Text(stringResource(R.string.issue_title)) },
+                    supportingText = { Text("${title.length}/$REPORT_TITLE_MAX") },
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = { description = it.take(REPORT_BODY_MAX) },
                     label = { Text(stringResource(R.string.issue_description)) },
+                    supportingText = { Text("${description.length}/$REPORT_BODY_MAX") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
+                        .height(140.dp),
                     shape = RoundedCornerShape(12.dp)
                 )
             }
