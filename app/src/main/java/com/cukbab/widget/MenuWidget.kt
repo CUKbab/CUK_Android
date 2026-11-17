@@ -79,22 +79,24 @@ class MenuWidget : GlanceAppWidget() {
             val today = queryDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             val nowTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
-            var menuText = "No menu data."
+            var menuText = context.getString(R.string.widget_no_menu_data)
             try {
                 val menuData = withContext(Dispatchers.IO) {
                     com.cukbab.data.MenuRepository.getMenu(context, queryDate, forceRefresh = true)
                 }
                 val rawMenu = menuData[jsonKey]?.get(today) ?: "No Menu"
-                menuText = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) "No menu for today." else rawMenu
+                menuText = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) context.getString(R.string.widget_no_menu_today) else rawMenu
 
                 if (category == "Pranzo-Korean" || category == "Pranzo-Global-Noodle") {
                     val plusMenu = menuData["Pranzo-Plus-Corner"]?.get(today) ?: "No Menu"
                     if (plusMenu.trim() != "No Menu" && plusMenu.isNotEmpty()) {
-                        menuText += "\n\n[Plus Corner]\n$plusMenu"
+                        menuText += "\n\n[${context.getString(R.string.category_plus_corner)}]\n$plusMenu"
                     }
                 }
+            } catch (e: com.cukbab.data.MenuNotPublishedException) {
+                menuText = context.getString(R.string.menu_not_published)
             } catch (e: Exception) {
-                menuText = "Error: ${e.localizedMessage}"
+                menuText = context.getString(R.string.widget_error)
             }
 
             // Update the internal state of the widget
@@ -115,7 +117,7 @@ class MenuWidget : GlanceAppWidget() {
         provideContent {
             val prefs = currentState<Preferences>()
             val headerTitle = prefs[headerTitleKey] ?: "CUKbab"
-            val menu = prefs[menuContentKey] ?: "Tap to refresh"
+            val menu = prefs[menuContentKey] ?: context.getString(R.string.widget_tap_to_refresh)
             val lastUpdate = prefs[lastUpdateKey] ?: "--:--:--"
             val fontSize = prefs[menuFontSizeKey] ?: 11f
 

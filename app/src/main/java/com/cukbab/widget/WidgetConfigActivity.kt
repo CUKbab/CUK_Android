@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.cukbab.data.WidgetPreferences
 import com.cukbab.ui.theme.CUKbabTheme
 import com.cukbab.ui.theme.ThemePreference
-import kotlinx.coroutines.MainScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.cukbab.R
@@ -69,7 +69,8 @@ class WidgetConfigActivity : ComponentActivity() {
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         setResult(Activity.RESULT_OK, resultValue)
 
-        MainScope().launch {
+        // lifecycleScope is cancelled with the activity, unlike the old unscoped MainScope().
+        lifecycleScope.launch {
             // Give the system a moment to register the widget
             delay(300)
             val manager = androidx.glance.appwidget.GlanceAppWidgetManager(this@WidgetConfigActivity)
@@ -108,7 +109,7 @@ fun WidgetConfigScreen(onConfigComplete: (String, String, Float) -> Unit) {
             value = fontSize,
             onValueChange = { fontSize = it },
             valueRange = 8f..24f,
-            steps = 16
+            steps = 15 // 17 positions: whole sp values 8..24
         )
 
         Spacer(modifier = Modifier.height(16.dp))

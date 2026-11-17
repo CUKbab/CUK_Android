@@ -121,6 +121,7 @@ fun CUKbabApp(
 
     val scope = rememberCoroutineScope()
     val failedToFetchMenu = stringResource(R.string.failed_to_fetch_menu)
+    val menuNotPublished = stringResource(R.string.menu_not_published)
 
     // Tutorial States
     var isTutorialActive by remember { 
@@ -196,6 +197,16 @@ fun CUKbabApp(
         }
     }
 
+    // Check for updates only once the tutorial and changelog are out of the way,
+    // so the update dialog never stacks on top of them.
+    var checkedForUpdates by remember { mutableStateOf(false) }
+    LaunchedEffect(isTutorialActive, showChangelog, pendingChangelog) {
+        if (!checkedForUpdates && !isTutorialActive && !showChangelog && !pendingChangelog) {
+            checkedForUpdates = true
+            onCheckForUpdates()
+        }
+    }
+
     var menuJob by remember { mutableStateOf<Job?>(null) }
 
     val refreshMenu = { force: Boolean, date: LocalDate ->
@@ -222,8 +233,10 @@ fun CUKbabApp(
                 uiState = MenuUiState.Success(data)
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: MenuNotPublishedException) {
+                uiState = MenuUiState.Error(menuNotPublished)
             } catch (e: Exception) {
-                uiState = MenuUiState.Error(e.localizedMessage ?: failedToFetchMenu)
+                uiState = MenuUiState.Error(failedToFetchMenu)
             }
         }
     }
@@ -392,7 +405,10 @@ fun CUKbabApp(
                                     icon = { Icon(screen.icon, contentDescription = label) },
                                     label = { Text(label) },
                                     selected = selectedScreen == screen,
-                                    onClick = { selectedScreen = screen }
+                                    onClick = {
+                                        selectedScreen = screen
+                                        currentSubMenu = null
+                                    }
                                 )
                             }
                             Spacer(Modifier.weight(1f))

@@ -55,6 +55,9 @@ object RetrofitClient {
     }
 }
 
+/** The requested week has no menu on the server yet (e.g. a future week). */
+class MenuNotPublishedException : Exception("Menu not published")
+
 object MenuRepository {
     private const val PREFS_NAME = "menu_cache"
     private const val KEY_MENU_JSON_PREFIX = "cached_menu_json_"
@@ -104,7 +107,11 @@ object MenuRepository {
         val weekNumber = date.get(weekFields.weekOfWeekBasedYear())
         val year = date.get(weekFields.weekBasedYear())
         return withContext(Dispatchers.IO) {
-            RetrofitClient.menuService.getArchivedMenu(year, weekNumber)
+            try {
+                RetrofitClient.menuService.getArchivedMenu(year, weekNumber)
+            } catch (e: retrofit2.HttpException) {
+                if (e.code() == 404) throw MenuNotPublishedException() else throw e
+            }
         }
     }
 

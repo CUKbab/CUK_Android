@@ -132,4 +132,25 @@
     <string name="menu_updated_desc">今週の献立が新しい情報で更新されました。</string>
     <string name="announcement_notifications">お知らせ通知</string>
     <string name="announcement_notifications_desc">新しいお知らせや献立の更新通知を受け取ります。</string>
+    <string name="menu_not_published">今週のメニューはまだ公開されていません。</string>
+    <string name="expand">展開</string>
+    <string name="collapse">折りたたむ</string>
+    <string name="urgent_prefix">[緊急] %1$s</string>
+    <string name="announcements_load_failed">お知らせを読み込めませんでした。</string>
+    <string name="no_announcements">現在お知らせはありません。</string>
+    <string name="sign_in_failed">サインインに失敗しました: %1$s</string>
+    <string name="no_saved_credentials">この端末に Google アカウントが見つかりません。追加してから再試行してください。</string>
+    <string name="generic_error">エラーが発生しました: %1$s</string>
+    <string name="widget_updated">ウィジェットを更新しました</string>
+    <string name="information">情報</string>
+    <string name="unknown">不明</string>
+    <string name="selected">選択済み</string>
+    <string name="widget_no_menu_data">メニューデータがありません。</string>
+    <string name="widget_no_menu_today">本日のメニューはありません。</string>
+    <string name="widget_error">メニューを読み込めませんでした。タップして再試行してください。</string>
+    <string name="widget_tap_to_refresh">タップして更新</string>
+    <string name="update_available_desc_store">Google Play ストアで CUK밥 の新しいバージョン (%1$s) が利用可能です。</string>
+    <string name="experimental_features">実験的機能</string>
+    <string name="dual_pane_mode">デュアルペインモード</string>
+    <string name="dual_pane_mode_desc">タブレットや折りたたみ端末で 2 つの食堂を並べて表示します。</string>
 </resources>

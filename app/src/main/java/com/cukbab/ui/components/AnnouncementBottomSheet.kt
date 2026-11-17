@@ -87,13 +87,13 @@ fun AnnouncementBottomSheet(
                 }
             } else if (error != null) {
                 Text(
-                    text = "Failed to load announcements: $error",
+                    text = stringResource(R.string.announcements_load_failed),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(vertical = 32.dp).align(Alignment.CenterHorizontally)
                 )
             } else if (announcementList.isNullOrEmpty()) {
                 Text(
-                    text = "No announcements at this time.",
+                    text = stringResource(R.string.no_announcements),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 32.dp).align(Alignment.CenterHorizontally)

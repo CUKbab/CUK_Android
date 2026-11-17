@@ -36,7 +36,7 @@ class AnnouncementWorker(
                     AnnouncementPreferences.setLastAnnouncementId(applicationContext, latest.id)
                 } else if (latest.id > lastSeenId) {
                     val title = if (latest.type.lowercase() == "urgent") {
-                        "[URGENT] ${latest.title}"
+                        applicationContext.getString(R.string.urgent_prefix, latest.title)
                     } else {
                         applicationContext.getString(R.string.announcements) + ": " + latest.title
                     }
@@ -45,7 +45,7 @@ class AnnouncementWorker(
                         context = applicationContext,
                         title = title,
                         message = latest.content,
-                        notificationId = 1000 + latest.id,
+                        notificationId = ANNOUNCEMENT_NOTIFICATION_ID,
                         category = NotificationCompat.CATEGORY_EVENT
                     )
 
@@ -64,7 +64,7 @@ class AnnouncementWorker(
                     context = applicationContext,
                     title = applicationContext.getString(R.string.menu_updated_title),
                     message = applicationContext.getString(R.string.menu_updated_desc),
-                    notificationId = 2000,
+                    notificationId = MENU_UPDATE_NOTIFICATION_ID,
                     category = NotificationCompat.CATEGORY_STATUS
                 )
             }
@@ -78,6 +78,10 @@ class AnnouncementWorker(
 
     companion object {
         private const val WORK_NAME = "announcement_polling_work"
+        // Fixed IDs: a newer announcement replaces the older one, and the two never collide
+        // (previously 1000 + id clashed with the menu-update ID 2000 when id == 1000).
+        private const val ANNOUNCEMENT_NOTIFICATION_ID = 1000
+        private const val MENU_UPDATE_NOTIFICATION_ID = 2000
 
         fun schedule(context: Context) {
             val constraints = Constraints.Builder()

@@ -51,6 +51,9 @@ fun AccountSettingsScreen(onBack: () -> Unit) {
 
     val credentialManager = CredentialManager.create(context)
     val webClientId = BuildConfig.GOOGLE_CLIENT_ID
+    // Resolved during composition (lint: no resource lookups through LocalContext).
+    val signInFailedFmt = stringResource(R.string.sign_in_failed)
+    val genericErrorFmt = stringResource(R.string.generic_error)
     suspend fun handleSignIn() {
         isLoggingIn = true
         val googleIdOption = GetGoogleIdOption.Builder()
@@ -75,16 +78,16 @@ fun AccountSettingsScreen(onBack: () -> Unit) {
                 val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
                 FirebaseAuth.getInstance().signInWithCredential(firebaseCredential).await()
             } catch (e: Exception) {
-                Toast.makeText(context, "Sign-in failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, signInFailedFmt.format(e.localizedMessage ?: ""), Toast.LENGTH_SHORT).show()
             }
         } catch (e: GetCredentialCancellationException) {
             // User canceled, do nothing
         } catch (e: NoCredentialException) {
-            Toast.makeText(context, "No saved credentials found. Please sign in.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.no_saved_credentials, Toast.LENGTH_SHORT).show()
         } catch (e: GetCredentialException) {
-            Toast.makeText(context, "Sign-in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, signInFailedFmt.format(e.message ?: ""), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(context, "An error occurred: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, genericErrorFmt.format(e.localizedMessage ?: ""), Toast.LENGTH_SHORT).show()
         } finally {
             isLoggingIn = false
         }

@@ -77,7 +77,7 @@ fun WidgetSettingsScreen(onBack: () -> Unit) {
                                 val glanceId = manager.getGlanceIdBy(widgetId)
                                 // Fetch fresh data and update the widget state immediately
                                 com.cukbab.widget.MenuWidget.fetchAndRefresh(context, glanceId)
-                                Toast.makeText(context, "Widget Updated", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.widget_updated, Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {
                                 // Widget might have been removed but ID still exists in prefs
                             }
@@ -121,7 +121,7 @@ private fun WidgetConfigItem(index: Int, widgetId: Int, onUpdate: () -> Unit) {
             },
             onValueChangeFinished = { onUpdate() },
             valueRange = 8f..24f,
-            steps = 16
+            steps = 15 // 17 positions: whole sp values 8..24
         )
 
         Spacer(modifier = Modifier.height(16.dp))

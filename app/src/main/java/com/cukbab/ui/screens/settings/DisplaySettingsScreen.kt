@@ -119,7 +119,7 @@ fun DisplaySettingsScreen(
                     } else if (isSelected) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Selected",
+                            contentDescription = stringResource(R.string.selected),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )

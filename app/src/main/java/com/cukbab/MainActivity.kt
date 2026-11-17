@@ -95,10 +95,6 @@ class MainActivity : AppCompatActivity() {
             val snackbarHostState = remember { SnackbarHostState() }
             var languagePreference by remember { mutableStateOf(initialLanguage) }
 
-            LaunchedEffect(Unit) {
-                updater.check()
-            }
-
             val downloadingMsg = stringResource(R.string.update_downloading)
             val readyMsg = stringResource(R.string.update_ready)
             val restartLabel = stringResource(R.string.restart)
@@ -171,6 +167,7 @@ class MainActivity : AppCompatActivity() {
                 (updateState as? UpdateState.Available)?.let { available ->
                     UpdateDialog(
                         versionName = available.versionName,
+                        inApp = available.inApp,
                         onDismiss = { updater.dismiss() },
                         onUpdate = { updater.startUpdate() }
                     )
@@ -191,13 +188,16 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun UpdateDialog(versionName: String, onDismiss: () -> Unit, onUpdate: () -> Unit) {
+fun UpdateDialog(versionName: String, inApp: Boolean, onDismiss: () -> Unit, onUpdate: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.update_available)) },
         text = { 
             Text(
-                stringResource(R.string.update_available_desc, versionName)
+                stringResource(
+                    if (inApp) R.string.update_available_desc else R.string.update_available_desc_store,
+                    versionName
+                )
             ) 
         },
         confirmButton = {

@@ -22,7 +22,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 sealed interface UpdateState {
     data object Idle : UpdateState
-    data class Available(val versionName: String) : UpdateState
+    /** [inApp]: true for a Play in-app download, false when the Play Store page will open. */
+    data class Available(val versionName: String, val inApp: Boolean) : UpdateState
     /** [progress] in 0..1, or null while the size is unknown. */
     data class Downloading(val progress: Float?) : UpdateState
     data object ReadyToInstall : UpdateState
@@ -91,7 +92,7 @@ class AppUpdater(private val activity: ComponentActivity) : DefaultLifecycleObse
                     playInfo = info
                     val name = VersionRepository.checkForUpdate(activity)?.versionName
                         ?: info.availableVersionCode().toString()
-                    _state.value = UpdateState.Available(name)
+                    _state.value = UpdateState.Available(name, inApp = true)
                     return true
                 }
                 return false
@@ -103,7 +104,7 @@ class AppUpdater(private val activity: ComponentActivity) : DefaultLifecycleObse
         }
         playInfo = null
         val latest = VersionRepository.checkForUpdate(activity) ?: return false
-        _state.value = UpdateState.Available(latest.versionName)
+        _state.value = UpdateState.Available(latest.versionName, inApp = false)
         return true
     }
 

@@ -143,7 +143,7 @@ fun MenuList(
                                             )
                                             Icon(
                                                 imageVector = Icons.Default.KeyboardArrowDown,
-                                                contentDescription = if (isCollapsed) "Expand" else "Collapse",
+                                                contentDescription = stringResource(if (isCollapsed) R.string.expand else R.string.collapse),
                                                 tint = MaterialTheme.colorScheme.secondary,
                                                 modifier = Modifier.rotate(rotationState)
                                             )

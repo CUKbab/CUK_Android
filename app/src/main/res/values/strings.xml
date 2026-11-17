@@ -161,4 +161,22 @@
     <string name="menu_updated_desc">This week\'s menu has been updated with new information.</string>
     <string name="announcement_notifications">Announcement Notifications</string>
     <string name="announcement_notifications_desc">Receive notifications for new announcements and menu updates.</string>
+    <string name="menu_not_published">This week\'s menu hasn\'t been published yet.</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="urgent_prefix">[URGENT] %1$s</string>
+    <string name="announcements_load_failed">Failed to load announcements.</string>
+    <string name="no_announcements">No announcements at this time.</string>
+    <string name="sign_in_failed">Sign-in failed: %1$s</string>
+    <string name="no_saved_credentials">No Google account found on this device. Add one and try again.</string>
+    <string name="generic_error">An error occurred: %1$s</string>
+    <string name="widget_updated">Widget updated</string>
+    <string name="information">Information</string>
+    <string name="unknown">Unknown</string>
+    <string name="selected">Selected</string>
+    <string name="widget_no_menu_data">No menu data.</string>
+    <string name="widget_no_menu_today">No menu for today.</string>
+    <string name="widget_error">Couldn\'t load the menu. Tap to retry.</string>
+    <string name="widget_tap_to_refresh">Tap to refresh</string>
+    <string name="update_available_desc_store">A new version of CUK밥 (%1$s) is available on the Google Play Store.</string>
 </resources>

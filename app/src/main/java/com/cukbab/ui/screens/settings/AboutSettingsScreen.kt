@@ -44,7 +44,7 @@ fun AboutSettingsScreen(onBack: () -> Unit, onCheckForUpdates: suspend () -> Boo
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             packageInfo.versionName
         } catch (e: Exception) {
-            "Unknown"
+            null
         }
     }
 
@@ -79,7 +79,7 @@ fun AboutSettingsScreen(onBack: () -> Unit, onCheckForUpdates: suspend () -> Boo
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = stringResource(R.string.version_label, versionName ?: "Unknown"),
+            text = stringResource(R.string.version_label, versionName ?: stringResource(R.string.unknown)),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -116,7 +116,7 @@ fun AboutSettingsScreen(onBack: () -> Unit, onCheckForUpdates: suspend () -> Boo
 
         // Info Sections
         Text(
-            text = "Information",
+            text = stringResource(R.string.information),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, bottom = 8.dp)
         )
