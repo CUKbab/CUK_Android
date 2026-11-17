@@ -81,24 +81,31 @@ object WidgetSchedule {
     }
 
     private const val WORK_NAME = "widget_meal_boundary_refresh"
+    const val BOUNDARY_TAG = "widget_boundary"
 
-    /** Refresh all widgets at the next meal boundary. Safe to call repeatedly. */
-    fun scheduleNext(context: Context) {
+    /**
+     * Refresh all widgets at the next meal boundary. Safe to call repeatedly: KEEP leaves an
+     * already-pending refresh alone. Never REPLACE from onUpdate: enqueueing toggles WorkManager's
+     * receivers, which makes the system send APPWIDGET_UPDATE again, and REPLACE then cancels the
+     * running refresh, an endless cancel/re-enqueue loop.
+     */
+    fun scheduleNext(context: Context, policy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP) {
         val now = LocalDateTime.now()
         // +30 s so the clock is clearly past the boundary when the worker runs.
         val delayMs = Duration.between(now, nextBoundary(now)).toMillis() + 30_000
         val request = OneTimeWorkRequestBuilder<WidgetRefreshWorker>()
             .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
+            .addTag(BOUNDARY_TAG)
             .build()
         WorkManager.getInstance(context)
-            .enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+            .enqueueUniqueWork(WORK_NAME, policy, request)
     }
 
     /** Refresh all widgets as soon as possible (network fetch runs in a worker). */
     fun refreshNow(context: Context) {
         val request = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().build()
         WorkManager.getInstance(context)
-            .enqueueUniqueWork(REFRESH_NOW_NAME, ExistingWorkPolicy.REPLACE, request)
+            .enqueueUniqueWork(REFRESH_NOW_NAME, ExistingWorkPolicy.KEEP, request)
     }
 
     private const val REFRESH_NOW_NAME = "widget_refresh_now"
@@ -119,7 +126,13 @@ class WidgetRefreshWorker(context: Context, params: WorkerParameters) : Coroutin
                 // One broken widget shouldn't stop the others.
             }
         }
-        if (ids.isNotEmpty()) WidgetSchedule.scheduleNext(applicationContext)
+        if (ids.isNotEmpty()) {
+            // The boundary job is itself the pending WORK_NAME entry, so KEEP would skip;
+            // chain the next boundary after it. A manual refresh only fills a missing schedule.
+            val policy = if (tags.contains(WidgetSchedule.BOUNDARY_TAG)) ExistingWorkPolicy.APPEND_OR_REPLACE
+            else ExistingWorkPolicy.KEEP
+            WidgetSchedule.scheduleNext(applicationContext, policy)
+        }
         return Result.success()
     }
 }
