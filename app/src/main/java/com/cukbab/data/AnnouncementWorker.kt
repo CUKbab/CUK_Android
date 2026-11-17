@@ -21,12 +21,20 @@ class AnnouncementWorker(
 
             // 1. Check for new announcements
             val lang = AnnouncementRepository.getAnnouncementLang(applicationContext)
-            val announcements = AnnouncementRepository.getAnnouncements(lang)
+            // Don't let an announcement fetch failure skip the menu check below.
+            val announcements = try {
+                AnnouncementRepository.getAnnouncements(lang)
+            } catch (e: Exception) {
+                emptyList()
+            }
             if (announcements.isNotEmpty()) {
                 val latest = announcements.maxByOrNull { it.id } ?: return@withContext Result.success()
                 val lastSeenId = AnnouncementPreferences.getLastAnnouncementId(applicationContext)
 
-                if (latest.id > lastSeenId) {
+                if (lastSeenId == -1) {
+                    // First run: mark existing announcements as seen instead of notifying about old ones.
+                    AnnouncementPreferences.setLastAnnouncementId(applicationContext, latest.id)
+                } else if (latest.id > lastSeenId) {
                     val title = if (latest.type.lowercase() == "urgent") {
                         "[URGENT] ${latest.title}"
                     } else {

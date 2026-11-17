@@ -203,6 +203,8 @@ fun NotificationSettingsScreen(onBack: () -> Unit) {
                 minutesBefore = it.toInt()
                 NotificationPreferences.setMinutesBefore(context, minutesBefore)
             },
+            // Existing alarms were set with the old lead time.
+            onValueChangeFinished = { MealNotificationManager.rescheduleAll(context) },
             valueRange = 5f..60f,
             steps = 10
         )

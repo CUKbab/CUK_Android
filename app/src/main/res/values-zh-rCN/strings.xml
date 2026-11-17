@@ -78,6 +78,7 @@
     <string name="remind_me">餐前提醒分钟数</string>
     <string name="notification_scheduled">通知已计划</string>
     <string name="notification_cancelled">通知已取消</string>
+    <string name="notification_time_passed">提醒时间已过</string>
     <string name="set_reminder">设置提醒</string>
     <string name="cancel_reminder">取消提醒</string>
     <string name="report_deleted">反馈已删除</string>

@@ -50,6 +50,8 @@ import com.cukbab.ui.screens.CafeBonaScreen
 import com.cukbab.ui.screens.SettingsScreen
 import com.cukbab.ui.theme.ThemePreference
 import com.cukbab.ui.screens.settings.SettingsSubMenu
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -194,31 +196,36 @@ fun CUKbabApp(
         }
     }
 
+    var menuJob by remember { mutableStateOf<Job?>(null) }
+
     val refreshMenu = { force: Boolean, date: LocalDate ->
-        scope.launch {
+        // Cancel any in-flight load so a slow, older response can't overwrite a newer week.
+        menuJob?.cancel()
+        menuJob = scope.launch {
             val currentMenuData = when (val state = uiState) {
                 is MenuUiState.Success -> state.menuData
                 is MenuUiState.Refreshing -> state.menuData
                 else -> null
             }
 
-            if (force) {
-                uiState = MenuUiState.Refreshing(currentMenuData)
-            } else if (!com.cukbab.data.MenuRepository.isCached(context, date)) {
-                uiState = MenuUiState.Loading
+            val cached = if (force) null else MenuRepository.getCachedMenu(context, date)
+            uiState = when {
+                force -> MenuUiState.Refreshing(currentMenuData)
+                cached != null -> MenuUiState.Success(cached)
+                else -> MenuUiState.Loading
             }
 
             try {
-                val data = com.cukbab.data.MenuRepository.getMenu(context, date, force)
+                // Always hit the network so mid-week menu changes show up; cached data stays
+                // on screen meanwhile. getMenu falls back to the cache if the network fails.
+                val data = MenuRepository.getMenu(context, date, forceRefresh = true)
                 uiState = MenuUiState.Success(data)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 uiState = MenuUiState.Error(e.localizedMessage ?: failedToFetchMenu)
             }
         }
-    }
-
-    LaunchedEffect(Unit) {
-        refreshMenu(false, selectedDate)
     }
 
     var lastLoadedWeek by remember { mutableStateOf<Pair<Int, Int>?>(null) }
@@ -227,7 +234,7 @@ fun CUKbabApp(
     // Refresh menu only when moving to a different week
     LaunchedEffect(selectedDate) {
         val weekNumber = selectedDate.get(weekFields.weekOfWeekBasedYear())
-        val year = selectedDate.year
+        val year = selectedDate.get(weekFields.weekBasedYear())
         
         val currentWeekInfo = year to weekNumber
         if (lastLoadedWeek != currentWeekInfo) {
@@ -462,8 +469,6 @@ fun CUKbabApp(
                         TutorialRepository.setMainTutorialComplete(context)
                         TutorialRepository.setSettingsTutorialComplete(context)
                         isTutorialActive = false
-                        // Schedule announcement polling after tutorial
-                        AnnouncementWorker.schedule(context)
                         // Once tutorial is over, check if we need to show the changelog
                         if (pendingChangelog) {                            showChangelog = true
                             pendingChangelog = false
@@ -780,12 +785,7 @@ fun ChangelogDialog(language: String, onDismiss: () -> Unit) {
     var changelogText by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     
-    val workerLang = when {
-        language.startsWith("ko") -> "ko"
-        language.startsWith("ja") -> "ja"
-        language.startsWith("zh") -> "zn"
-        else -> "en"
-    }
+    val workerLang = AnnouncementRepository.contentLangFor(language)
 
     LaunchedEffect(Unit) {
         val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "unknown"

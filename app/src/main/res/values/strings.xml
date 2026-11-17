@@ -107,6 +107,7 @@
     <string name="remind_me">Minutes before meal</string>
     <string name="notification_scheduled">Notification scheduled</string>
     <string name="notification_cancelled">Notification cancelled</string>
+    <string name="notification_time_passed">This meal\'s reminder time has already passed</string>
     <string name="set_reminder">Set Reminder</string>
     <string name="cancel_reminder">Cancel Reminder</string>
     <string name="report_deleted">Report deleted</string>

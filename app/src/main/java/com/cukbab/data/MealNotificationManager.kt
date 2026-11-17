@@ -25,19 +25,36 @@ object MealNotificationManager {
         "Bona-Rice-Bowl" to LocalTime.of(11, 30)
     )
 
-    fun scheduleNotification(context: Context, category: String, date: String, menu: String) {
+    /** Re-registers every saved reminder (after reboot, app update or lead-time change). */
+    fun rescheduleAll(context: Context) {
+        for (itemId in NotificationPreferences.getScheduledItems(context)) {
+            val category = itemId.substringBeforeLast("|")
+            val date = itemId.substringAfterLast("|")
+            val menu = try {
+                MenuRepository.getCachedMenu(context, LocalDate.parse(date))?.get(category)?.get(date)
+            } catch (e: Exception) {
+                null
+            } ?: ""
+            if (!scheduleNotification(context, category, date, menu)) {
+                NotificationPreferences.removeScheduledItem(context, itemId)
+            }
+        }
+    }
+
+    /** @return true if an alarm was set; false if the time has passed or input is invalid. */
+    fun scheduleNotification(context: Context, category: String, date: String, menu: String): Boolean {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val startTime = mealStartTimes[category]
         if (startTime == null) {
             Log.e(TAG, "No start time found for category: $category")
-            return
+            return false
         }
         
         val mealDate = try {
             LocalDate.parse(date)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to parse date: $date", e)
-            return
+            return false
         }
         
         val minutesBefore = NotificationPreferences.getMinutesBefore(context)
@@ -57,7 +74,7 @@ object MealNotificationManager {
 
         if (triggerAtMillis <= now) {
             Log.w(TAG, "Trigger time in the past, skipping.")
-            return
+            return false
         }
 
         val intent = Intent(context, NotificationReceiver::class.java).apply {
@@ -95,6 +112,7 @@ object MealNotificationManager {
             Log.e(TAG, "Failed to set alarm, falling back to set()", e)
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
         }
+        return true
     }
 
     fun cancelNotification(context: Context, category: String, date: String) {

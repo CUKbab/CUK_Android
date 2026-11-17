@@ -37,6 +37,7 @@ fun MenuCard(category: String, menu: String, date: String) {
 
     val notificationScheduledMsg = stringResource(R.string.notification_scheduled)
     val notificationCancelledMsg = stringResource(R.string.notification_cancelled)
+    val notificationTimePassedMsg = stringResource(R.string.notification_time_passed)
 
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -58,13 +59,20 @@ fun MenuCard(category: String, menu: String, date: String) {
                 if (menu != stringResource(R.string.no_menu)) {
                     IconButton(
                         onClick = {
-                            NotificationPreferences.toggleSchedule(context, category, date)
-                            isScheduled = NotificationPreferences.isScheduled(context, category, date)
-                            if (isScheduled) {
-                                MealNotificationManager.scheduleNotification(context, category, date, menu)
-                                Toast.makeText(context, notificationScheduledMsg, Toast.LENGTH_SHORT).show()
+                            val itemId = "$category|$date"
+                            if (!isScheduled) {
+                                // Only mark as scheduled if an alarm was actually set.
+                                if (MealNotificationManager.scheduleNotification(context, category, date, menu)) {
+                                    NotificationPreferences.addScheduledItem(context, itemId)
+                                    isScheduled = true
+                                    Toast.makeText(context, notificationScheduledMsg, Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, notificationTimePassedMsg, Toast.LENGTH_SHORT).show()
+                                }
                             } else {
                                 MealNotificationManager.cancelNotification(context, category, date)
+                                NotificationPreferences.removeScheduledItem(context, itemId)
+                                isScheduled = false
                                 Toast.makeText(context, notificationCancelledMsg, Toast.LENGTH_SHORT).show()
                             }
                         },

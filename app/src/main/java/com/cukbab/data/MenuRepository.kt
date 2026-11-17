@@ -73,9 +73,7 @@ object MenuRepository {
         return try {
             // 1. Try to fetch from latest.json first
             var rawData = withContext(Dispatchers.IO) {
-                val latest = RetrofitClient.menuService.getLatestMenu()
-                MenuPreferences.setLastMenuHash(context, latest.hashCode())
-                latest
+                RetrofitClient.menuService.getLatestMenu()
             }
 
             // 2. Check if latest.json actually contains the requested date
@@ -94,6 +92,8 @@ object MenuRepository {
             }
 
             menuData
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Fallback to cache if network fails
             getCachedMenu(context, cacheKey) ?: throw e
@@ -102,7 +102,7 @@ object MenuRepository {
 
     private suspend fun fetchArchivedMenu(date: LocalDate): MenuData {
         val weekNumber = date.get(weekFields.weekOfWeekBasedYear())
-        val year = date.year
+        val year = date.get(weekFields.weekBasedYear())
         return withContext(Dispatchers.IO) {
             RetrofitClient.menuService.getArchivedMenu(year, weekNumber)
         }
@@ -122,13 +122,14 @@ object MenuRepository {
     }
 
     private fun isSameWeek(d1: LocalDate, d2: LocalDate): Boolean {
-        return d1.year == d2.year && 
+        return d1.get(weekFields.weekBasedYear()) == d2.get(weekFields.weekBasedYear()) && 
                d1.get(weekFields.weekOfWeekBasedYear()) == d2.get(weekFields.weekOfWeekBasedYear())
     }
 
     private fun getCacheKey(date: LocalDate): String {
         val weekNumber = date.get(weekFields.weekOfWeekBasedYear())
-        return "$KEY_MENU_JSON_PREFIX${date.year}_$weekNumber"
+        // ISO week-based year, matching the archive layout in CUK_Menu (date.isocalendar()).
+        return "$KEY_MENU_JSON_PREFIX${date.get(weekFields.weekBasedYear())}_$weekNumber"
     }
 
     private fun cacheMenu(context: Context, key: String, data: MenuData) {
@@ -137,6 +138,10 @@ object MenuRepository {
             putString(key, json)
         }
     }
+
+    /** Cached menu for the week containing [date], or null if not cached. */
+    fun getCachedMenu(context: Context, date: LocalDate): MenuData? =
+        getCachedMenu(context, getCacheKey(date))
 
     private fun getCachedMenu(context: Context, key: String): MenuData? {
         val json = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

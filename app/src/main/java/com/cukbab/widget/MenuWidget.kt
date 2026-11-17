@@ -1,5 +1,6 @@
 package com.cukbab.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -21,7 +22,10 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.cukbab.R
 import com.cukbab.data.RetrofitClient
 import com.cukbab.data.WidgetPreferences
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalTime
@@ -78,7 +82,7 @@ class MenuWidget : GlanceAppWidget() {
             var menuText = "No menu data."
             try {
                 val menuData = withContext(Dispatchers.IO) {
-                    com.cukbab.data.MenuRepository.getMenu(context, queryDate)
+                    com.cukbab.data.MenuRepository.getMenu(context, queryDate, forceRefresh = true)
                 }
                 val rawMenu = menuData[jsonKey]?.get(today) ?: "No Menu"
                 menuText = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) "No menu for today." else rawMenu
@@ -181,6 +185,31 @@ class RefreshAction : ActionCallback {
 
 class MenuWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = MenuWidget()
+
+    // Periodic APPWIDGET_UPDATE (updatePeriodMillis) only re-renders stored state, so fetch
+    // fresh menu data here; otherwise the widget keeps showing yesterday's menu.
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        val pendingResult = goAsync()
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            try {
+                val manager = GlanceAppWidgetManager(context)
+                appWidgetIds.forEach { id ->
+                    try {
+                        MenuWidget.fetchAndRefresh(context, manager.getGlanceIdBy(id))
+                    } catch (e: Exception) {
+                        // Widget removed or not yet bound; skip.
+                    }
+                }
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         super.onDeleted(context, appWidgetIds)

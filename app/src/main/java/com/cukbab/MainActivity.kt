@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             NotificationPreferences.clearOldSchedules(this@MainActivity, LocalDate.now().toString())
         }
+
+        // Idempotent (KEEP policy); ensures polling also runs for users who skipped the tutorial.
+        AnnouncementWorker.schedule(this)
         
         enableEdgeToEdge()
         @Suppress("DEPRECATION")

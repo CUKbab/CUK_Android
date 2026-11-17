@@ -82,6 +82,7 @@
     <string name="remind_me">식사 시작 전 미리 알림</string>
     <string name="notification_scheduled">알림이 예약되었습니다</string>
     <string name="notification_cancelled">알림이 취소되었습니다</string>
+    <string name="notification_time_passed">이미 알림 시간이 지났습니다</string>
     <string name="set_reminder">알림 설정</string>
     <string name="cancel_reminder">알림 취소</string>
     <string name="report_deleted">제보 삭제됨</string>

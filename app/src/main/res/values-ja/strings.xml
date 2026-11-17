@@ -78,6 +78,7 @@
     <string name="remind_me">食事の何分前に通知</string>
     <string name="notification_scheduled">通知が予約されました</string>
     <string name="notification_cancelled">通知がキャンセルされました</string>
+    <string name="notification_time_passed">通知時刻はすでに過ぎています</string>
     <string name="set_reminder">リマインダーを設定</string>
     <string name="cancel_reminder">リマインダーをキャンセル</string>
     <string name="report_deleted">レポートが削除されました</string>
