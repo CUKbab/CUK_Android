@@ -55,6 +55,12 @@ fun AccountSettingsScreen(onBack: () -> Unit) {
     val signInFailedFmt = stringResource(R.string.sign_in_failed)
     val genericErrorFmt = stringResource(R.string.generic_error)
     suspend fun handleSignIn() {
+        // GOOGLE_CLIENT_ID is injected by CI; local builds may not have it, and an empty
+        // ID makes setServerClientId() throw outside the try below (crashed the app).
+        if (webClientId.isBlank()) {
+            Toast.makeText(context, signInFailedFmt.format("missing Google client ID"), Toast.LENGTH_SHORT).show()
+            return
+        }
         isLoggingIn = true
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
