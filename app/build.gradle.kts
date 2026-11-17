@@ -31,22 +31,7 @@ android {
         buildConfigField("String", "ADMIN_EMAIL", "\"${project.findProperty("adminEmail") ?: keystoreProperties["adminEmail"] ?: ""}\"")
         buildConfigField("String", "REPORTER_BASE_URL", "\"${project.findProperty("reporterBaseUrl") ?: keystoreProperties["reporterBaseUrl"] ?: ""}\"")
         buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${project.findProperty("googleClientId") ?: keystoreProperties["googleClientId"] ?: ""}\"")
-    }
-
-    flavorDimensions += "version"
-    productFlavors {
-        create("full") {
-            dimension = "version"
-            buildConfigField("Boolean", "SHOW_AUTH_FEATURES", "true")
-            resValue("string", "app_name_flavor", "CUK밥")
-        }
-        create("lite") {
-            dimension = "version"
-            applicationIdSuffix = ".lite"
-            versionNameSuffix = "-lite"
-            buildConfigField("Boolean", "SHOW_AUTH_FEATURES", "false")
-            resValue("string", "app_name_flavor", "CUK밥-lite")
-        }
+        resValue("string", "app_name_flavor", "CUK밥")
     }
 
     signingConfigs {
@@ -110,14 +95,14 @@ dependencies {
     implementation(libs.coil.network)
     implementation(libs.material)
 
-    // Firebase & Auth (Full version only)
-    "fullImplementation"(platform(libs.firebase.bom))
-    "fullImplementation"(libs.firebase.auth)
-    "fullImplementation"(libs.firebase.firestore)
-    "fullImplementation"(libs.play.services.auth)
-    "fullImplementation"(libs.androidx.credentials)
-    "fullImplementation"(libs.androidx.credentials.play.services.auth)
-    "fullImplementation"(libs.googleid)
+    // Firebase & Auth
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // Retrofit & Networking
     implementation(libs.retrofit)
@@ -139,7 +124,5 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
 }
 
-// Conditionally apply Google Services plugin at the bottom for better compatibility
-if (project.findProperty("isLite") != "true") {
-    apply(plugin = "com.google.gms.google-services")
-}
+// Apply Google Services plugin at the bottom for better compatibility
+apply(plugin = "com.google.gms.google-services")

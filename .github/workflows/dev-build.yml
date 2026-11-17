@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-variants:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,34 +38,18 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build Both Variants
+      - name: Build Release
         run: |
-          ./gradlew assembleFullRelease \
-            -PadminEmail="${{ secrets.ADMIN_EMAIL }}" \
-            -PreporterBaseUrl="${{ secrets.REPORTER_BASE_URL }}" \
-            -PgoogleClientId="${{ secrets.GOOGLE_CLIENT_ID }}"
-          ./gradlew assembleLiteRelease -PisLite=true \
+          ./gradlew assembleRelease \
             -PadminEmail="${{ secrets.ADMIN_EMAIL }}" \
             -PreporterBaseUrl="${{ secrets.REPORTER_BASE_URL }}" \
             -PgoogleClientId="${{ secrets.GOOGLE_CLIENT_ID }}"
 
-      - name: Sign Full APK
+      - name: Sign APK
         uses: r0adkll/sign-android-release@v1
-        id: sign_full
+        id: sign
         with:
-          releaseDirectory: app/build/outputs/apk/full/release
-          signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
-          alias: ${{ secrets.RELEASE_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
-
-      - name: Sign Lite APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_lite
-        with:
-          releaseDirectory: app/build/outputs/apk/lite/release
+          releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
@@ -75,17 +59,11 @@ jobs:
 
       - name: Rename and Prepare Artifacts
         run: |
-          mv ${{ steps.sign_full.outputs.signedReleaseFile }} app/build/outputs/apk/full/release/cuk밥-full-release.apk
-          mv ${{ steps.sign_lite.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
+          mv ${{ steps.sign.outputs.signedReleaseFile }} app/build/outputs/apk/release/cukbab-release.apk
 
-      - name: Upload Full APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: cuk밥-full-release
-          path: app/build/outputs/apk/full/release/cuk밥-full-release.apk
+          name: cukbab-release
+          path: app/build/outputs/apk/release/cukbab-release.apk
 
-      - name: Upload Lite APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: cuk밥-lite-release
-          path: app/build/outputs/apk/lite/release/cuk밥-lite-release.apk

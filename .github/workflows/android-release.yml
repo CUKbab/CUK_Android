@@ -45,34 +45,18 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build Variants
+      - name: Build Release
         run: |
-          ./gradlew assembleFullRelease \
-            -PadminEmail="${{ secrets.ADMIN_EMAIL }}" \
-            -PreporterBaseUrl="${{ secrets.REPORTER_BASE_URL }}" \
-            -PgoogleClientId="${{ secrets.GOOGLE_CLIENT_ID }}"
-          ./gradlew assembleLiteRelease -PisLite=true \
+          ./gradlew assembleRelease \
             -PadminEmail="${{ secrets.ADMIN_EMAIL }}" \
             -PreporterBaseUrl="${{ secrets.REPORTER_BASE_URL }}" \
             -PgoogleClientId="${{ secrets.GOOGLE_CLIENT_ID }}"
 
-      - name: Sign Full APK
+      - name: Sign APK
         uses: r0adkll/sign-android-release@v1
-        id: sign_full
+        id: sign
         with:
-          releaseDirectory: app/build/outputs/apk/full/release
-          signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
-          alias: ${{ secrets.RELEASE_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
-
-      - name: Sign Lite APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_lite
-        with:
-          releaseDirectory: app/build/outputs/apk/lite/release
+          releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE }}
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
@@ -82,8 +66,7 @@ jobs:
 
       - name: Prepare APKs
         run: |
-          mv ${{ steps.sign_full.outputs.signedReleaseFile }} app/build/outputs/apk/full/release/cuk밥-full-release.apk
-          mv ${{ steps.sign_lite.outputs.signedReleaseFile }} app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
+          mv ${{ steps.sign.outputs.signedReleaseFile }} app/build/outputs/apk/release/cukbab-release.apk
 
       - name: Get version name
         id: get_version
@@ -95,9 +78,6 @@ jobs:
         run: |
           # Fetch the latest English changelog from the main CUK repo
           curl -s https://raw.githubusercontent.com/CUKbab/CUK/refs/heads/main/changelogs/en.md > release_notes.md
-          
-          # Append the Lite version explanation
-          echo -e "\n---\n## CUK밥 Lite Edition\nThis is an open-source friendly version of CUK밥 with the following changes:\n- **No Firebase:** Completely removed Google Firebase and Google Services dependencies.\n- **Privacy Focused:** Removed all tracking, and remote reporting features.\n- **Lightweight:** Smaller APK size due to removed libraries.\n- **Feature Note:** Account settings and menu error reporting are disabled in this version." >> release_notes.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -106,7 +86,6 @@ jobs:
           name: ${{ github.event.inputs.tag_name && format('Release {0}', github.event.inputs.tag_name) || format('Release {0}', steps.get_version.outputs.VERSION) }}
           body_path: release_notes.md
           files: |
-            app/build/outputs/apk/full/release/cuk밥-full-release.apk
-            app/build/outputs/apk/lite/release/cuk밥-lite-release.apk
+            app/build/outputs/apk/release/cukbab-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
