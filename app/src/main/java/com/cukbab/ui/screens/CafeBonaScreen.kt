@@ -16,13 +16,24 @@ fun CafeBonaScreen(
     val context = LocalContext.current
     var collapsedGroups by remember { mutableStateOf(MenuPreferences.getCollapsedGroups(context)) }
 
+    val menuData = state.menuData
+    val hasOnlyLunchDinner = menuData != null && menuData.keys.isNotEmpty() && menuData.keys.all { it == "Lunch" || it == "Dinner" }
+    val groups = if (hasOnlyLunchDinner) {
+        mapOf(
+            R.string.group_lunch to listOf("Lunch"),
+            R.string.group_dinner to listOf("Dinner")
+        )
+    } else {
+        mapOf(
+            R.string.screen_cafe_bona to listOf("Bona-Rice-Bowl")
+        )
+    }
+
     MenuList(
         state = state,
         today = dateString,
         showOperatingHours = showOperatingHours,
-        groups = mapOf(
-            R.string.screen_cafe_bona to listOf("Bona-Rice-Bowl")
-        ),
+        groups = groups,
         collapsedGroups = collapsedGroups,
         onToggleGroup = { groupResId ->
             val isCurrentlyCollapsed = collapsedGroups.contains(groupResId)

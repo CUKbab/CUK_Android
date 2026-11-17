@@ -37,6 +37,9 @@ fun categoryLabel(category: String): String = when (category) {
     "Pranzo-Plus-Corner" -> stringResource(R.string.category_plus_corner)
     "Pranzo-Dinner" -> stringResource(R.string.category_dinner)
     "Bona-Rice-Bowl" -> stringResource(R.string.category_rice_bowl)
+    // Vacation-format menus only have these two keys.
+    "Lunch" -> stringResource(R.string.group_lunch)
+    "Dinner" -> stringResource(R.string.category_dinner)
     else -> category
 }
 

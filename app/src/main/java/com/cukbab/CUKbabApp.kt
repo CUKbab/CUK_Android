@@ -513,6 +513,8 @@ fun CUKbabApp(
             menuData = menuState.menuData,
             selectedDate = selectedDate,
             categories = when {
+                menuState.menuData?.keys?.let { k -> k.isNotEmpty() && k.all { it == "Lunch" || it == "Dinner" } } == true ->
+                    listOf("Lunch", "Dinner")
                 selectedScreen == Screen.CafeBona && !isDualPaneEnabled -> listOf("Bona-Rice-Bowl")
                 isDualPaneEnabled -> listOf("Morning", "Pranzo-Korean", "Pranzo-Global-Noodle", "Pranzo-Dinner", "Bona-Rice-Bowl")
                 else -> listOf("Morning", "Pranzo-Korean", "Pranzo-Global-Noodle", "Pranzo-Plus-Corner", "Pranzo-Dinner")

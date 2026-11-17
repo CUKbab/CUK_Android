@@ -50,6 +50,8 @@ class MenuWidget : GlanceAppWidget() {
                 "Pranzo-Plus-Corner" -> context.getString(R.string.category_plus_corner)
                 "Pranzo-Dinner" -> context.getString(R.string.category_dinner)
                 "Bona-Rice-Bowl" -> context.getString(R.string.category_rice_bowl)
+                "Lunch" -> context.getString(R.string.group_lunch)
+                "Dinner" -> context.getString(R.string.category_dinner)
                 else -> category
             }
         }
@@ -81,7 +83,11 @@ class MenuWidget : GlanceAppWidget() {
             val dateKey = queryDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
             fun menuTextFrom(menuData: com.cukbab.data.MenuData): String {
-                val rawMenu = menuData[jsonKey]?.get(dateKey) ?: "No Menu"
+                // Vacation-format menus only have "Lunch" and "Dinner".
+                val key = if (jsonKey !in menuData && ("Lunch" in menuData || "Dinner" in menuData)) {
+                    if (jsonKey == "Pranzo-Dinner") "Dinner" else "Lunch"
+                } else jsonKey
+                val rawMenu = menuData[key]?.get(dateKey) ?: "No Menu"
                 var text = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) context.getString(R.string.widget_no_menu_today) else rawMenu
                 if (jsonKey == "Pranzo-Korean" || jsonKey == "Pranzo-Global-Noodle") {
                     val plusMenu = menuData["Pranzo-Plus-Corner"]?.get(dateKey) ?: "No Menu"
