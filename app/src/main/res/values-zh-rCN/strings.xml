@@ -98,8 +98,11 @@
 
     <!-- App Updater -->
     <string name="update_available">可用更新！</string>
-    <string name="update_available_desc">Google Play 商店中有 CUK밥 的新版本 (%s) 可用。</string>
+    <string name="update_available_desc">CUK밥 的新版本 (%s) 可用。您可以继续使用应用，更新将在后台下载。</string>
     <string name="update">更新</string>
+    <string name="update_downloading">正在下载更新…</string>
+    <string name="update_ready">更新已下载。重新启动以安装。</string>
+    <string name="restart">重新启动</string>
     <string name="version_label">版本 %s</string>
     <string name="license_info">开源许可</string>
     <string name="source_code">源代码</string>

@@ -12,9 +12,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
-import com.cukbab.data.AppVersion
 import com.cukbab.data.NotificationPreferences
-import com.cukbab.data.VersionRepository
+import com.cukbab.update.AppUpdater
+import com.cukbab.update.UpdateState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.cukbab.ui.theme.CUKbabTheme
 import com.cukbab.ui.theme.ThemePreference
 import java.time.LocalDate
@@ -28,6 +35,8 @@ import com.cukbab.data.AnnouncementWorker
 import com.cukbab.data.AnnouncementPreferences
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var updater: AppUpdater
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -37,6 +46,9 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             NotificationPreferences.clearOldSchedules(this@MainActivity, LocalDate.now().toString())
         }
+
+        // Registers an activity result launcher, so it must be created before the activity starts.
+        updater = AppUpdater(this)
 
         // Idempotent (KEEP policy); ensures polling also runs for users who skipped the tutorial.
         AnnouncementWorker.schedule(this)
@@ -79,12 +91,31 @@ class MainActivity : AppCompatActivity() {
             var showOperatingHours by remember { mutableStateOf(initialShowOperatingHours) }
             var experimentalDualPane by remember { mutableStateOf(initialExperimentalDualPane) }
             var customAccentColor by remember { mutableStateOf<Color?>(initialCustomAccentColor) }
-            var updateInfo by remember { mutableStateOf<AppVersion?>(null) }
+            val updateState by updater.state.collectAsState()
+            val snackbarHostState = remember { SnackbarHostState() }
             var languagePreference by remember { mutableStateOf(initialLanguage) }
 
-            // Still check for updates and potentially refresh state from other sources if needed
             LaunchedEffect(Unit) {
-                updateInfo = VersionRepository.checkForUpdate(this@MainActivity)
+                updater.check()
+            }
+
+            val downloadingMsg = stringResource(R.string.update_downloading)
+            val readyMsg = stringResource(R.string.update_ready)
+            val restartLabel = stringResource(R.string.restart)
+            val isDownloading = updateState is UpdateState.Downloading
+            val isReady = updateState == UpdateState.ReadyToInstall
+            LaunchedEffect(isDownloading, isReady) {
+                when {
+                    isReady -> {
+                        val result = snackbarHostState.showSnackbar(
+                            message = readyMsg,
+                            actionLabel = restartLabel,
+                            duration = SnackbarDuration.Indefinite
+                        )
+                        if (result == SnackbarResult.ActionPerformed) updater.completeUpdate()
+                    }
+                    isDownloading -> snackbarHostState.showSnackbar(downloadingMsg)
+                }
             }
 
             CUKbabTheme(
@@ -134,17 +165,24 @@ class MainActivity : AppCompatActivity() {
                             prefs.edit { putLong("accent_color", color.toArgb().toLong()) }
                         }
                     },
-                    onUpdateFound = { updateInfo = it }
+                    onCheckForUpdates = { updater.check() }
                 )
 
-                if (updateInfo != null) {
+                (updateState as? UpdateState.Available)?.let { available ->
                     UpdateDialog(
-                        updateInfo!!,
-                        onDismiss = { updateInfo = null },
-                        onUpdate = {
-                            VersionRepository.openPlayStore(this@MainActivity)
-                            updateInfo = null
-                        }
+                        versionName = available.versionName,
+                        onDismiss = { updater.dismiss() },
+                        onUpdate = { updater.startUpdate() }
+                    )
+                }
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding()
+                            .padding(bottom = 80.dp)
                     )
                 }
             }
@@ -153,13 +191,13 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun UpdateDialog(appVersion: AppVersion, onDismiss: () -> Unit, onUpdate: () -> Unit) {
+fun UpdateDialog(versionName: String, onDismiss: () -> Unit, onUpdate: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.update_available)) },
         text = { 
             Text(
-                stringResource(R.string.update_available_desc, appVersion.versionName)
+                stringResource(R.string.update_available_desc, versionName)
             ) 
         },
         confirmButton = {

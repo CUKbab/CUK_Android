@@ -128,8 +128,11 @@
 
     <!-- App Updater -->
     <string name="update_available">Update Available!</string>
-    <string name="update_available_desc">A new version of CUK밥 (%s) is available on the Google Play Store.</string>
+    <string name="update_available_desc">A new version of CUK밥 (%s) is available. It downloads in the background while you keep using the app.</string>
     <string name="update">Update</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_ready">Update downloaded. Restart to install.</string>
+    <string name="restart">Restart</string>
     <string name="version_label">Version %s</string>
     <string name="license_info">Open Source Licenses</string>
     <string name="source_code">App Source Code</string>

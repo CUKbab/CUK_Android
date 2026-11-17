@@ -98,8 +98,11 @@
 
     <!-- App Updater -->
     <string name="update_available">アップデートが利用可能です！</string>
-    <string name="update_available_desc">Google Play ストアで CUK밥 の新しいバージョン (%s) が利用可能です。</string>
+    <string name="update_available_desc">CUK밥 の新しいバージョン (%s) が利用可能です。アプリを使用中にバックグラウンドでダウンロードされます。</string>
     <string name="update">アップデート</string>
+    <string name="update_downloading">アップデートをダウンロード中…</string>
+    <string name="update_ready">アップデートのダウンロードが完了しました。再起動してインストールしてください。</string>
+    <string name="restart">再起動</string>
     <string name="version_label">バージョン %s</string>
     <string name="license_info">オープンソースライセンス</string>
     <string name="source_code">ソースコード</string>

@@ -102,8 +102,11 @@
 
     <!-- App Updater -->
     <string name="update_available">업데이트 가능!</string>
-    <string name="update_available_desc">Google Play 스토어에서 새로운 버전의 CUK밥 (%s)을 사용할 수 있습니다.</string>
+    <string name="update_available_desc">새로운 버전의 CUK밥 (%s)을 사용할 수 있습니다. 앱을 사용하는 동안 백그라운드에서 다운로드됩니다.</string>
     <string name="update">업데이트</string>
+    <string name="update_downloading">업데이트 다운로드 중…</string>
+    <string name="update_ready">업데이트가 다운로드되었습니다. 다시 시작하여 설치하세요.</string>
+    <string name="restart">다시 시작</string>
     <string name="version_label">버전 %s</string>
     <string name="license_info">오픈소스 라이선스</string>
     <string name="source_code">소스 코드</string>

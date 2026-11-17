@@ -10,7 +10,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.platform.LocalContext
 import com.cukbab.R
 import com.cukbab.LanguagePreference
-import com.cukbab.data.AppVersion
 import com.cukbab.ui.screens.settings.*
 import com.cukbab.ui.theme.ThemePreference
 
@@ -31,7 +30,7 @@ fun SettingsScreen(
     customAccentColor: Color?,
     onAccentColorChange: (Color?) -> Unit,
     onShowChangelog: () -> Unit,
-    onUpdateFound: (AppVersion) -> Unit,
+    onCheckForUpdates: suspend () -> Boolean,
     onDisplayCoordsMeasured: (LayoutCoordinates) -> Unit,
     onWidgetCoordsMeasured: (LayoutCoordinates) -> Unit,
     onNotifCoordsMeasured: (LayoutCoordinates) -> Unit,
@@ -71,7 +70,7 @@ fun SettingsScreen(
             SettingsSubMenu.Admin -> AdminPanelScreen(onBack = { onSubMenuChange(null) })
             SettingsSubMenu.About -> AboutSettingsScreen(
                 onBack = { onSubMenuChange(null) },
-                onUpdateFound = onUpdateFound
+                onCheckForUpdates = onCheckForUpdates
             )
         }
     }

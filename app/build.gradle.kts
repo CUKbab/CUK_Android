@@ -104,6 +104,9 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
+    // In-app updates (Google Play)
+    implementation(libs.play.app.update.ktx)
+
     // Retrofit & Networking
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)

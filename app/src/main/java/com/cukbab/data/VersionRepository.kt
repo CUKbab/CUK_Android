@@ -48,10 +48,19 @@ object VersionRepository {
 
     fun openPlayStore(context: Context) {
         val packageName = context.packageName
-        try {
-            context.startActivity(Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri()))
-        } catch (e: Exception) {
-            context.startActivity(Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=$packageName".toUri()))
+        val uris = listOf(
+            "market://details?id=$packageName",
+            "https://play.google.com/store/apps/details?id=$packageName"
+        )
+        for (uri in uris) {
+            try {
+                context.startActivity(
+                    Intent(Intent.ACTION_VIEW, uri.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+                return
+            } catch (e: Exception) {
+                // No handler for this URI; try the next one.
+            }
         }
     }
 }

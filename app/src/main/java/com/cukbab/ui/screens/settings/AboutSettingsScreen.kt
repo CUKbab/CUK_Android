@@ -28,13 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import com.cukbab.R
-import com.cukbab.data.AppVersion
-import com.cukbab.data.VersionRepository
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import kotlinx.coroutines.launch
 
 @Composable
-fun AboutSettingsScreen(onBack: () -> Unit, onUpdateFound: (AppVersion) -> Unit) {
+fun AboutSettingsScreen(onBack: () -> Unit, onCheckForUpdates: suspend () -> Boolean) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var isCheckingUpdates by remember { mutableStateOf(false) }
@@ -106,11 +104,8 @@ fun AboutSettingsScreen(onBack: () -> Unit, onUpdateFound: (AppVersion) -> Unit)
                     if (!isCheckingUpdates) {
                         scope.launch {
                             isCheckingUpdates = true
-                            val update = VersionRepository.checkForUpdate(context)
-                            if (update == null) {
+                            if (!onCheckForUpdates()) {
                                 Toast.makeText(context, R.string.on_latest_version, Toast.LENGTH_SHORT).show()
-                            } else {
-                                onUpdateFound(update)
                             }
                             isCheckingUpdates = false
                         }
