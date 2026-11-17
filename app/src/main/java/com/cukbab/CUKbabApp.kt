@@ -43,6 +43,7 @@ import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import com.cukbab.data.*
 import com.cukbab.ui.components.DateSelector
+import com.cukbab.ui.components.WeekOverviewSheet
 import com.cukbab.ui.components.MenuScreenState
 import com.cukbab.ui.components.adjacentWeekday
 import com.cukbab.ui.components.AnimatedTutorialOverlay
@@ -106,6 +107,7 @@ fun CUKbabApp(
     }
     var currentSubMenu by remember { mutableStateOf<SettingsSubMenu?>(null) }
     var showAnnouncements by remember { mutableStateOf(false) }
+    var showWeekOverview by remember { mutableStateOf(false) }
     var uiState by remember { mutableStateOf<MenuUiState>(MenuUiState.Loading) }
     
     val initialDate = remember {
@@ -281,7 +283,8 @@ fun CUKbabApp(
         isStale = (uiState as? MenuUiState.Success)?.isStale == true,
         onRefresh = { refreshMenu(true, selectedDate) },
         onGoToCurrentWeek = { selectedDate = initialDate },
-        onSwipeDay = { forward -> selectedDate = adjacentWeekday(selectedDate, forward) }
+        onSwipeDay = { forward -> selectedDate = adjacentWeekday(selectedDate, forward) },
+        onShowWeekOverview = { showWeekOverview = true }
     )
 
     Surface(
@@ -331,6 +334,9 @@ fun CUKbabApp(
                                 },
                                 actions = {
                                     if (selectedScreen != Screen.Settings) {
+                                        IconButton(onClick = { showWeekOverview = true }) {
+                                            Icon(Icons.Default.CalendarViewWeek, contentDescription = stringResource(R.string.week_overview))
+                                        }
                                         IconButton(onClick = { showAnnouncements = true }) {
                                             Icon(Icons.Default.Campaign, contentDescription = stringResource(R.string.announcements))
                                         }
@@ -405,6 +411,9 @@ fun CUKbabApp(
                             modifier = Modifier.systemBarsPadding(),
                             header = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    IconButton(onClick = { showWeekOverview = true }) {
+                                        Icon(Icons.Default.CalendarViewWeek, contentDescription = stringResource(R.string.week_overview))
+                                    }
                                     IconButton(onClick = { showAnnouncements = true }) {
                                         Icon(Icons.Default.Campaign, contentDescription = stringResource(R.string.announcements))
                                     }
@@ -497,6 +506,23 @@ fun CUKbabApp(
                 )
             }
         }
+    }
+
+    if (showWeekOverview) {
+        WeekOverviewSheet(
+            menuData = menuState.menuData,
+            selectedDate = selectedDate,
+            categories = when {
+                selectedScreen == Screen.CafeBona && !isDualPaneEnabled -> listOf("Bona-Rice-Bowl")
+                isDualPaneEnabled -> listOf("Morning", "Pranzo-Korean", "Pranzo-Global-Noodle", "Pranzo-Dinner", "Bona-Rice-Bowl")
+                else -> listOf("Morning", "Pranzo-Korean", "Pranzo-Global-Noodle", "Pranzo-Plus-Corner", "Pranzo-Dinner")
+            },
+            onDaySelected = {
+                selectedDate = it
+                showWeekOverview = false
+            },
+            onDismiss = { showWeekOverview = false }
+        )
     }
 
     if (showAnnouncements) {
@@ -714,6 +740,12 @@ fun ContentArea(
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = onShowAnnouncements) {
                             Icon(Icons.Default.Campaign, contentDescription = stringResource(R.string.announcements))
+                        }
+                        if (screen !is Screen.Settings) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(onClick = menuState.onShowWeekOverview) {
+                                Icon(Icons.Default.CalendarViewWeek, contentDescription = stringResource(R.string.week_overview))
+                            }
                         }
                     }
                     

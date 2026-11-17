@@ -160,4 +160,5 @@
     <string name="saved_menu_banner">오프라인: 저장된 메뉴를 표시합니다. 아래로 당겨 새로고침하세요.</string>
     <string name="retry">다시 시도</string>
     <string name="kcal_format">%1$d kcal</string>
+    <string name="week_overview">주간 메뉴</string>
 </resources>

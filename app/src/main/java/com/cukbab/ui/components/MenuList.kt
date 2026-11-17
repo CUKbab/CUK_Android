@@ -50,7 +50,8 @@ data class MenuScreenState(
     val onRefresh: () -> Unit,
     val onGoToCurrentWeek: () -> Unit,
     /** forward = true for the next weekday. */
-    val onSwipeDay: (forward: Boolean) -> Unit
+    val onSwipeDay: (forward: Boolean) -> Unit,
+    val onShowWeekOverview: () -> Unit = {}
 )
 
 /** Serving window per menu group header. Also drives the "(08:00 ~ 09:30)" labels. */

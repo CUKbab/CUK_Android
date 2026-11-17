@@ -28,6 +28,18 @@ internal fun splitCalories(menu: String): Pair<String, Int?> {
     return menu.removeRange(match.range).trimEnd() to match.groupValues[1].toIntOrNull()
 }
 
+/** Display name for a menu JSON category key. */
+@Composable
+fun categoryLabel(category: String): String = when (category) {
+    "Morning" -> stringResource(R.string.category_1000_won_morning)
+    "Pranzo-Korean" -> stringResource(R.string.category_korean_cuisine)
+    "Pranzo-Global-Noodle" -> stringResource(R.string.category_global_noodle)
+    "Pranzo-Plus-Corner" -> stringResource(R.string.category_plus_corner)
+    "Pranzo-Dinner" -> stringResource(R.string.category_dinner)
+    "Bona-Rice-Bowl" -> stringResource(R.string.category_rice_bowl)
+    else -> category
+}
+
 @Composable
 fun MenuCard(category: String, menu: String, date: String) {
     val (menuText, kcal) = remember(menu) { splitCalories(menu) }
@@ -36,15 +48,7 @@ fun MenuCard(category: String, menu: String, date: String) {
         mutableStateOf(NotificationPreferences.isScheduled(context, category, date)) 
     }
 
-    val categoryDisplay = when (category) {
-        "Morning" -> stringResource(R.string.category_1000_won_morning)
-        "Pranzo-Korean" -> stringResource(R.string.category_korean_cuisine)
-        "Pranzo-Global-Noodle" -> stringResource(R.string.category_global_noodle)
-        "Pranzo-Plus-Corner" -> stringResource(R.string.category_plus_corner)
-        "Pranzo-Dinner" -> stringResource(R.string.category_dinner)
-        "Bona-Rice-Bowl" -> stringResource(R.string.category_rice_bowl)
-        else -> category
-    }
+    val categoryDisplay = categoryLabel(category)
 
     val notificationScheduledMsg = stringResource(R.string.notification_scheduled)
     val notificationCancelledMsg = stringResource(R.string.notification_cancelled)
