@@ -153,4 +153,10 @@
     <string name="experimental_features">实验性功能</string>
     <string name="dual_pane_mode">双窗格模式</string>
     <string name="dual_pane_mode_desc">在平板和折叠屏设备上并排显示两个食堂。</string>
+    <string name="today">今天</string>
+    <string name="now_serving">供应中</string>
+    <string name="up_next">下一餐</string>
+    <string name="back_to_this_week">返回本周</string>
+    <string name="saved_menu_banner">离线：正在显示已保存的菜单。下拉即可刷新。</string>
+    <string name="retry">重试</string>
 </resources>

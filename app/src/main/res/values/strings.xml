@@ -179,4 +179,10 @@
     <string name="widget_error">Couldn\'t load the menu. Tap to retry.</string>
     <string name="widget_tap_to_refresh">Tap to refresh</string>
     <string name="update_available_desc_store">A new version of CUK밥 (%1$s) is available on the Google Play Store.</string>
+    <string name="today">Today</string>
+    <string name="now_serving">Now serving</string>
+    <string name="up_next">Up next</string>
+    <string name="back_to_this_week">Back to this week</string>
+    <string name="saved_menu_banner">Offline: showing the saved menu. Pull down to refresh.</string>
+    <string name="retry">Retry</string>
 </resources>

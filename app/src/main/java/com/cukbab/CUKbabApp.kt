@@ -43,6 +43,8 @@ import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import com.cukbab.data.*
 import com.cukbab.ui.components.DateSelector
+import com.cukbab.ui.components.MenuScreenState
+import com.cukbab.ui.components.adjacentWeekday
 import com.cukbab.ui.components.AnimatedTutorialOverlay
 import com.cukbab.ui.components.TutorialStep
 import com.cukbab.ui.screens.BuonPranzoScreen
@@ -70,7 +72,10 @@ sealed class Screen(val route: String, val labelRes: Int, val icon: ImageVector)
 sealed class MenuUiState {
     data object Loading : MenuUiState()
     data class Refreshing(val menuData: MenuData?) : MenuUiState()
-    data class Success(val menuData: MenuData) : MenuUiState()
+    /** [isStale]: network failed, showing the saved copy. */
+    data class Success(val menuData: MenuData, val isStale: Boolean = false) : MenuUiState()
+    /** The selected week has no menu on the server yet. */
+    data object NotPublished : MenuUiState()
     data class Error(val message: String) : MenuUiState()
 }
 
@@ -121,7 +126,6 @@ fun CUKbabApp(
 
     val scope = rememberCoroutineScope()
     val failedToFetchMenu = stringResource(R.string.failed_to_fetch_menu)
-    val menuNotPublished = stringResource(R.string.menu_not_published)
 
     // Tutorial States
     var isTutorialActive by remember { 
@@ -219,7 +223,7 @@ fun CUKbabApp(
                 else -> null
             }
 
-            val cached = if (force) null else MenuRepository.getCachedMenu(context, date)
+            val cached = MenuRepository.getCachedMenu(context, date)
             uiState = when {
                 force -> MenuUiState.Refreshing(currentMenuData)
                 cached != null -> MenuUiState.Success(cached)
@@ -228,15 +232,19 @@ fun CUKbabApp(
 
             try {
                 // Always hit the network so mid-week menu changes show up; cached data stays
-                // on screen meanwhile. getMenu falls back to the cache if the network fails.
-                val data = MenuRepository.getMenu(context, date, forceRefresh = true)
+                // on screen meanwhile.
+                val data = MenuRepository.getMenu(context, date, forceRefresh = true, fallbackToCache = false)
                 uiState = MenuUiState.Success(data)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: MenuNotPublishedException) {
-                uiState = MenuUiState.Error(menuNotPublished)
+                uiState = MenuUiState.NotPublished
             } catch (e: Exception) {
-                uiState = MenuUiState.Error(failedToFetchMenu)
+                uiState = if (cached != null) {
+                    MenuUiState.Success(cached, isStale = true)
+                } else {
+                    MenuUiState.Error(failedToFetchMenu)
+                }
             }
         }
     }
@@ -255,6 +263,22 @@ fun CUKbabApp(
             lastLoadedWeek = currentWeekInfo
         }
     }
+
+    val menuState = MenuScreenState(
+        menuData = when (val state = uiState) {
+            is MenuUiState.Success -> state.menuData
+            is MenuUiState.Refreshing -> state.menuData
+            else -> null
+        },
+        isLoading = uiState is MenuUiState.Loading,
+        isRefreshing = uiState is MenuUiState.Refreshing,
+        error = (uiState as? MenuUiState.Error)?.message,
+        notPublished = uiState is MenuUiState.NotPublished,
+        isStale = (uiState as? MenuUiState.Success)?.isStale == true,
+        onRefresh = { refreshMenu(true, selectedDate) },
+        onGoToCurrentWeek = { selectedDate = initialDate },
+        onSwipeDay = { forward -> selectedDate = adjacentWeekday(selectedDate, forward) }
+    )
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -335,24 +359,12 @@ fun CUKbabApp(
                     },
                     contentWindowInsets = WindowInsets.systemBars
                 ) { innerPadding ->
-                    val menuData = when (val state = uiState) {
-                        is MenuUiState.Success -> state.menuData
-                        is MenuUiState.Refreshing -> state.menuData
-                        else -> null
-                    }
-                    val isLoading = uiState is MenuUiState.Loading
-                    val isRefreshing = uiState is MenuUiState.Refreshing
-                    val error = (uiState as? MenuUiState.Error)?.message
-
                     AnimatedContentArea(
                         selectedScreen,
                         currentSubMenu,
                         onSubMenuChange = { currentSubMenu = it },
-                        menuData,
-                        isLoading,
-                        isRefreshing,
-                        onRefresh = { refreshMenu(true, selectedDate) },
-                        error,
+                        menuState,
+                        homeDate = initialDate,
                         selectedDate,
                         onDateChange = { selectedDate = it },
                         weekFields,
@@ -414,24 +426,12 @@ fun CUKbabApp(
                             Spacer(Modifier.weight(1f))
                         }
                     }
-                    val menuData = when (val state = uiState) {
-                        is MenuUiState.Success -> state.menuData
-                        is MenuUiState.Refreshing -> state.menuData
-                        else -> null
-                    }
-                    val isLoading = uiState is MenuUiState.Loading
-                    val isRefreshing = uiState is MenuUiState.Refreshing
-                    val error = (uiState as? MenuUiState.Error)?.message
-
                     AnimatedContentArea(
                         selectedScreen,
                         currentSubMenu,
                         onSubMenuChange = { currentSubMenu = it },
-                        menuData,
-                        isLoading,
-                        isRefreshing,
-                        onRefresh = { refreshMenu(true, selectedDate) },
-                        error,
+                        menuState,
+                        homeDate = initialDate,
                         selectedDate,
                         onDateChange = { selectedDate = it },
                         weekFields,
@@ -521,11 +521,8 @@ fun AnimatedContentArea(
     screen: Screen,
     currentSubMenu: SettingsSubMenu?,
     onSubMenuChange: (SettingsSubMenu?) -> Unit,
-    menuData: MenuData?,
-    isLoading: Boolean,
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit,
-    error: String?,
+    menuState: MenuScreenState,
+    homeDate: LocalDate,
     selectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     weekFields: WeekFields,
@@ -573,11 +570,8 @@ fun AnimatedContentArea(
             targetScreen, 
             currentSubMenu,
             onSubMenuChange,
-            menuData, 
-            isLoading, 
-            isRefreshing, 
-            onRefresh, 
-            error, 
+            menuState,
+            homeDate,
             selectedDate, 
             onDateChange, 
             weekFields,
@@ -615,11 +609,8 @@ fun ContentArea(
     screen: Screen,
     currentSubMenu: SettingsSubMenu?,
     onSubMenuChange: (SettingsSubMenu?) -> Unit,
-    menuData: MenuData?,
-    isLoading: Boolean,
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit,
-    error: String?,
+    menuState: MenuScreenState,
+    homeDate: LocalDate,
     selectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     weekFields: WeekFields,
@@ -666,6 +657,7 @@ fun ContentArea(
                     DateSelector(
                         selectedDate = selectedDate,
                         onDateChange = onDateChange,
+                        homeDate = homeDate,
                         onCoordsMeasured = onCalendarCoordsMeasured
                     )
                 }
@@ -674,10 +666,10 @@ fun ContentArea(
 
                 when (screen) {
                     is Screen.BuonPranzo -> BuonPranzoScreen(
-                        menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                        menuState, dateString, showOperatingHours
                     )
                     is Screen.CafeBona -> CafeBonaScreen(
-                        menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                        menuState, dateString, showOperatingHours
                     )
                     is Screen.Settings -> SettingsScreen(
                         currentSubMenu, onSubMenuChange,
@@ -712,7 +704,7 @@ fun ContentArea(
                             }
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = onRefresh) {
+                        IconButton(onClick = menuState.onRefresh) {
                             Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -725,6 +717,7 @@ fun ContentArea(
                         DateSelector(
                             selectedDate = selectedDate,
                             onDateChange = onDateChange,
+                            homeDate = homeDate,
                             onCoordsMeasured = onCalendarCoordsMeasured
                         )
                     } else {
@@ -766,7 +759,7 @@ fun ContentArea(
                                     modifier = Modifier.padding(bottom = 8.dp).align(Alignment.CenterHorizontally)
                                 )
                                 BuonPranzoScreen(
-                                    menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                                    menuState, dateString, showOperatingHours
                                 )
                             }
                         }
@@ -784,7 +777,7 @@ fun ContentArea(
                                     modifier = Modifier.padding(bottom = 8.dp).align(Alignment.CenterHorizontally)
                                 )
                                 CafeBonaScreen(
-                                    menuData, isLoading, isRefreshing, onRefresh, error, dateString, showOperatingHours
+                                    menuState, dateString, showOperatingHours
                                 )
                             }
                         }

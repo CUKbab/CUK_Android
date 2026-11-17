@@ -153,4 +153,10 @@
     <string name="experimental_features">実験的機能</string>
     <string name="dual_pane_mode">デュアルペインモード</string>
     <string name="dual_pane_mode_desc">タブレットや折りたたみ端末で 2 つの食堂を並べて表示します。</string>
+    <string name="today">今日</string>
+    <string name="now_serving">提供中</string>
+    <string name="up_next">次の食事</string>
+    <string name="back_to_this_week">今週に戻る</string>
+    <string name="saved_menu_banner">オフライン：保存済みのメニューを表示しています。下に引いて更新してください。</string>
+    <string name="retry">再試行</string>
 </resources>

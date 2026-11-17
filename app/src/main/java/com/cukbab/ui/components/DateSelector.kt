@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,11 +48,22 @@ import java.time.temporal.TemporalAdjusters
 import kotlin.math.max
 import kotlin.math.roundToInt
 
+/** Next (or previous) weekday from [date], skipping Saturday and Sunday. */
+fun adjacentWeekday(date: LocalDate, forward: Boolean): LocalDate {
+    var d = if (forward) date.plusDays(1) else date.minusDays(1)
+    while (d.dayOfWeek == DayOfWeek.SATURDAY || d.dayOfWeek == DayOfWeek.SUNDAY) {
+        d = if (forward) d.plusDays(1) else d.minusDays(1)
+    }
+    return d
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateSelector(
     selectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
+    /** The default date ("today", or Monday on weekends); a Today button appears when away from it. */
+    homeDate: LocalDate? = null,
     isBackEnabled: Boolean = true,
     isForwardEnabled: Boolean = true,
     onCoordsMeasured: ((LayoutCoordinates) -> Unit)? = null
@@ -61,85 +73,93 @@ fun DateSelector(
     var parentCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
     val density = LocalDensity.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .onGloballyPositioned { parentCoords = it }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { parentCoords = it }
         ) {
-            IconButton(
-                onClick = { 
-                    var prev = selectedDate.minusDays(1)
-                    while (prev.dayOfWeek == DayOfWeek.SATURDAY || prev.dayOfWeek == DayOfWeek.SUNDAY) {
-                        prev = prev.minusDays(1)
-                    }
-                    onDateChange(prev)
-                },
-                enabled = isBackEnabled && !isExpanded
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.previous_day))
-            }
-
-            val configuration = LocalConfiguration.current
-            val locale = configuration.locales[0]
-            val formatter = remember(locale) {
-                DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.FULL).withLocale(locale)
-            }
-            
-            Surface(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 4.dp)
-                    .onGloballyPositioned { coords ->
-                        if (coords.isAttached) {
-                            dateAreaCoords = coords
-                            onCoordsMeasured?.invoke(coords)
-                        }
-                    },
-                shape = CircleShape,
-                color = Color.Transparent,
-                onClick = { 
-                    if (!isExpanded && dateAreaCoords != null && dateAreaCoords!!.isAttached) {
-                        isExpanded = true 
-                    }
-                }
-            ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                IconButton(
+                    onClick = { onDateChange(adjacentWeekday(selectedDate, forward = false)) },
+                    enabled = isBackEnabled && !isExpanded
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = selectedDate.format(formatter),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
-                    )
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.previous_day))
+                }
+
+                val configuration = LocalConfiguration.current
+                val locale = configuration.locales[0]
+                val formatter = remember(locale) {
+                    DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.FULL).withLocale(locale)
+                }
+            
+                Surface(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .onGloballyPositioned { coords ->
+                            if (coords.isAttached) {
+                                dateAreaCoords = coords
+                                onCoordsMeasured?.invoke(coords)
+                            }
+                        },
+                    shape = CircleShape,
+                    color = Color.Transparent,
+                    onClick = { 
+                        if (!isExpanded && dateAreaCoords != null && dateAreaCoords!!.isAttached) {
+                            isExpanded = true 
+                        }
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = selectedDate.format(formatter),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                IconButton(
+                    onClick = { onDateChange(adjacentWeekday(selectedDate, forward = true)) },
+                    enabled = isForwardEnabled && !isExpanded
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(R.string.next_day))
                 }
             }
+        }
 
-            IconButton(
-                onClick = { 
-                    var next = selectedDate.plusDays(1)
-                    while (next.dayOfWeek == DayOfWeek.SATURDAY || next.dayOfWeek == DayOfWeek.SUNDAY) {
-                        next = next.plusDays(1)
-                    }
-                    onDateChange(next)
-                },
-                enabled = isForwardEnabled && !isExpanded
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(R.string.next_day))
+        AnimatedVisibility(
+            visible = homeDate != null && selectedDate != homeDate && !isExpanded,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                FilledTonalButton(
+                    onClick = { homeDate?.let(onDateChange) },
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Icon(Icons.Default.Today, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.today), style = MaterialTheme.typography.labelLarge)
+                }
             }
         }
     }

@@ -64,7 +64,16 @@ object MenuRepository {
     private val gson = Gson()
     private val weekFields = WeekFields.ISO
 
-    suspend fun getMenu(context: Context, date: LocalDate, forceRefresh: Boolean = false): MenuData {
+    /**
+     * @param fallbackToCache when the network fails, return the cached week instead of throwing.
+     *   The app passes false to tell the user it is showing saved data.
+     */
+    suspend fun getMenu(
+        context: Context,
+        date: LocalDate,
+        forceRefresh: Boolean = false,
+        fallbackToCache: Boolean = true
+    ): MenuData {
         val cacheKey = getCacheKey(date)
 
         if (!forceRefresh) {
@@ -99,7 +108,7 @@ object MenuRepository {
             throw e
         } catch (e: Exception) {
             // Fallback to cache if network fails
-            getCachedMenu(context, cacheKey) ?: throw e
+            if (fallbackToCache) getCachedMenu(context, cacheKey) ?: throw e else throw e
         }
     }
 

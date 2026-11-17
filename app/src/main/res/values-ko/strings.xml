@@ -153,4 +153,10 @@
     <string name="widget_error">메뉴를 불러오지 못했습니다. 탭하여 다시 시도하세요.</string>
     <string name="widget_tap_to_refresh">탭하여 새로고침</string>
     <string name="update_available_desc_store">Google Play 스토어에서 새로운 버전의 CUK밥 (%1$s)을 사용할 수 있습니다.</string>
+    <string name="today">오늘</string>
+    <string name="now_serving">운영 중</string>
+    <string name="up_next">다음 식사</string>
+    <string name="back_to_this_week">이번 주로 돌아가기</string>
+    <string name="saved_menu_banner">오프라인: 저장된 메뉴를 표시합니다. 아래로 당겨 새로고침하세요.</string>
+    <string name="retry">다시 시도</string>
 </resources>
