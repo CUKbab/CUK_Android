@@ -30,6 +30,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 
 class MenuWidget : GlanceAppWidget() {
 
@@ -43,7 +44,7 @@ class MenuWidget : GlanceAppWidget() {
 
         private fun getCategoryDisplayName(context: Context, category: String): String {
             return when (category) {
-                "1000-won-Morning" -> context.getString(R.string.category_1000_won_morning)
+                "1000-won-Morning", "Morning" -> context.getString(R.string.category_1000_won_morning)
                 "Pranzo-Korean" -> context.getString(R.string.category_korean_cuisine)
                 "Pranzo-Global-Noodle" -> context.getString(R.string.category_global_noodle)
                 "Pranzo-Plus-Corner" -> context.getString(R.string.category_plus_corner)
@@ -64,18 +65,20 @@ class MenuWidget : GlanceAppWidget() {
             val category = WidgetPreferences.getSelectedCategory(context, widgetId)
             val fontSize = WidgetPreferences.getFontSize(context, widgetId)
             
-            // Fix for Morning mapping
-            val jsonKey = if (category == "1000-won-Morning") "Morning" else category
-            
-            val categoryDisplay = getCategoryDisplayName(context, category)
-            val headerTitle = "$cafeteria\n$categoryDisplay"
-            
+            // Pick the meal and day to show; after a meal ends this moves on to the next weekday.
+            val target = WidgetSchedule.resolve(category)
+            val jsonKey = target.jsonKey
+            val queryDate = target.date
             val todayDate = LocalDate.now()
-            val queryDate = when (todayDate.dayOfWeek) {
-                java.time.DayOfWeek.SATURDAY -> todayDate.minusDays(5)
-                java.time.DayOfWeek.SUNDAY -> todayDate.minusDays(6)
-                else -> todayDate
+
+            val categoryDisplay = getCategoryDisplayName(context, jsonKey)
+            val dayLabel = when (queryDate) {
+                todayDate -> null
+                todayDate.plusDays(1) -> context.getString(R.string.tomorrow)
+                else -> queryDate.dayOfWeek.getDisplayName(TextStyle.SHORT, context.resources.configuration.locales[0])
             }
+            val headerTitle = "$cafeteria\n$categoryDisplay" + (dayLabel?.let { " · $it" } ?: "")
+
             val today = queryDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             val nowTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
@@ -87,7 +90,7 @@ class MenuWidget : GlanceAppWidget() {
                 val rawMenu = menuData[jsonKey]?.get(today) ?: "No Menu"
                 menuText = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) context.getString(R.string.widget_no_menu_today) else rawMenu
 
-                if (category == "Pranzo-Korean" || category == "Pranzo-Global-Noodle") {
+                if (jsonKey == "Pranzo-Korean" || jsonKey == "Pranzo-Global-Noodle") {
                     val plusMenu = menuData["Pranzo-Plus-Corner"]?.get(today) ?: "No Menu"
                     if (plusMenu.trim() != "No Menu" && plusMenu.isNotEmpty()) {
                         menuText += "\n\n[${context.getString(R.string.category_plus_corner)}]\n$plusMenu"
@@ -196,6 +199,7 @@ class MenuWidgetReceiver : GlanceAppWidgetReceiver() {
         appWidgetIds: IntArray
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+        WidgetSchedule.scheduleNext(context)
         val pendingResult = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
@@ -211,6 +215,11 @@ class MenuWidgetReceiver : GlanceAppWidgetReceiver() {
                 pendingResult.finish()
             }
         }
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        WidgetSchedule.cancel(context)
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {

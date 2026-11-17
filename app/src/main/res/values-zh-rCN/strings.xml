@@ -161,4 +161,6 @@
     <string name="retry">重试</string>
     <string name="kcal_format">%1$d 千卡</string>
     <string name="week_overview">本周菜单</string>
+    <string name="widget_category_auto">当前餐次（自动）</string>
+    <string name="tomorrow">明天</string>
 </resources>

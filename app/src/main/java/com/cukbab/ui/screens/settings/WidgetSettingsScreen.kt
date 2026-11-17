@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cukbab.R
 import com.cukbab.data.WidgetPreferences
+import com.cukbab.widget.WIDGET_CATEGORY_AUTO
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -139,8 +140,8 @@ private fun WidgetConfigItem(index: Int, widgetId: Int, onUpdate: () -> Unit) {
                             selectedCategory = "Bona-Rice-Bowl"
                             WidgetPreferences.setSelectedCategory(context, widgetId, "Bona-Rice-Bowl")
                         } else {
-                            selectedCategory = "Pranzo-Korean"
-                            WidgetPreferences.setSelectedCategory(context, widgetId, "Pranzo-Korean")
+                            selectedCategory = WIDGET_CATEGORY_AUTO
+                            WidgetPreferences.setSelectedCategory(context, widgetId, WIDGET_CATEGORY_AUTO)
                         }
                         onUpdate()
                     },
@@ -156,6 +157,7 @@ private fun WidgetConfigItem(index: Int, widgetId: Int, onUpdate: () -> Unit) {
             Text(text = stringResource(R.string.category), style = MaterialTheme.typography.labelMedium)
             
             val categories = listOf(
+                WIDGET_CATEGORY_AUTO to stringResource(R.string.widget_category_auto),
                 "Morning" to stringResource(R.string.category_1000_won_morning),
                 "Pranzo-Korean" to stringResource(R.string.category_korean_cuisine),
                 "Pranzo-Global-Noodle" to stringResource(R.string.category_global_noodle),

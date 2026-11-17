@@ -77,6 +77,7 @@ class WidgetConfigActivity : ComponentActivity() {
             try {
                 val glanceId = manager.getGlanceIdBy(appWidgetId)
                 MenuWidget.fetchAndRefresh(this@WidgetConfigActivity, glanceId)
+                WidgetSchedule.scheduleNext(this@WidgetConfigActivity)
             } catch (e: Exception) {
                 // If it fails, the user can still tap the widget to refresh
             }
@@ -89,7 +90,7 @@ class WidgetConfigActivity : ComponentActivity() {
 @Composable
 fun WidgetConfigScreen(onConfigComplete: (String, String, Float) -> Unit) {
     var selectedCafeteria by remember { mutableStateOf("Buon Pranzo") }
-    var selectedCategory by remember { mutableStateOf("Pranzo-Korean") }
+    var selectedCategory by remember { mutableStateOf(WIDGET_CATEGORY_AUTO) }
     var fontSize by remember { mutableFloatStateOf(11f) }
 
     Column(
@@ -123,7 +124,7 @@ fun WidgetConfigScreen(onConfigComplete: (String, String, Float) -> Unit) {
                     selected = selectedCafeteria == cafeteria,
                     onClick = { 
                         selectedCafeteria = cafeteria 
-                        selectedCategory = if (cafeteria == "Cafe Bona") "Bona-Rice-Bowl" else "Pranzo-Korean"
+                        selectedCategory = if (cafeteria == "Cafe Bona") "Bona-Rice-Bowl" else WIDGET_CATEGORY_AUTO
                     },
                     label = { Text(cafeteria) },
                     modifier = Modifier.padding(end = 8.dp)
@@ -136,6 +137,7 @@ fun WidgetConfigScreen(onConfigComplete: (String, String, Float) -> Unit) {
             Text(text = stringResource(R.string.select_category), style = MaterialTheme.typography.titleMedium)
             
             val categories = listOf(
+                WIDGET_CATEGORY_AUTO to stringResource(R.string.widget_category_auto),
                 "Morning" to stringResource(R.string.category_1000_won_morning),
                 "Pranzo-Korean" to stringResource(R.string.category_korean_cuisine),
                 "Pranzo-Global-Noodle" to stringResource(R.string.category_global_noodle),

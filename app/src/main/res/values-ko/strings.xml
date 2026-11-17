@@ -161,4 +161,6 @@
     <string name="retry">다시 시도</string>
     <string name="kcal_format">%1$d kcal</string>
     <string name="week_overview">주간 메뉴</string>
+    <string name="widget_category_auto">현재 식사 (자동)</string>
+    <string name="tomorrow">내일</string>
 </resources>

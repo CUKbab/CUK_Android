@@ -187,4 +187,6 @@
     <string name="retry">Retry</string>
     <string name="kcal_format">%1$d kcal</string>
     <string name="week_overview">Week overview</string>
+    <string name="widget_category_auto">Current meal (auto)</string>
+    <string name="tomorrow">Tomorrow</string>
 </resources>
