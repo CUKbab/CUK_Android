@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher long-press shortcuts. The "screen" extra matches Screen.route in CUKbabApp. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="buon_pranzo"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_restaurant"
+        android:shortcutShortLabel="@string/screen_buon_pranzo">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.cukbab.MainActivity"
+            android:targetPackage="com.cukbab">
+            <extra android:name="screen" android:value="buon_pranzo" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="cafe_bona"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_coffee"
+        android:shortcutShortLabel="@string/screen_cafe_bona">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.cukbab.MainActivity"
+            android:targetPackage="com.cukbab">
+            <extra android:name="screen" android:value="cafe_bona" />
+        </intent>
+    </shortcut>
+</shortcuts>

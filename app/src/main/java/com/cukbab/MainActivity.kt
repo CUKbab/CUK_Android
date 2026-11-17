@@ -121,6 +121,7 @@ class MainActivity : AppCompatActivity() {
             ) {
                 CUKbabApp(
                     windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                    initialScreenRoute = intent?.getStringExtra("screen"),
                     themePreference = themePreference,
                     onThemeChange = {
                         themePreference = it

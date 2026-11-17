@@ -85,6 +85,8 @@ val screenList = listOf(Screen.BuonPranzo, Screen.CafeBona, Screen.Settings)
 @Composable
 fun CUKbabApp(
     windowWidthSizeClass: WindowWidthSizeClass,
+    /** Screen.route to open first (from a launcher shortcut), or null for the default. */
+    initialScreenRoute: String? = null,
     themePreference: ThemePreference,
     onThemeChange: (ThemePreference) -> Unit,
     baseFontSize: Float,
@@ -99,7 +101,9 @@ fun CUKbabApp(
     onAccentColorChange: (androidx.compose.ui.graphics.Color?) -> Unit,
     onCheckForUpdates: suspend () -> Boolean
 ) {
-    var selectedScreen by remember { mutableStateOf<Screen>(Screen.BuonPranzo) }
+    var selectedScreen by remember {
+        mutableStateOf(screenList.firstOrNull { it.route == initialScreenRoute } ?: Screen.BuonPranzo)
+    }
     var currentSubMenu by remember { mutableStateOf<SettingsSubMenu?>(null) }
     var showAnnouncements by remember { mutableStateOf(false) }
     var uiState by remember { mutableStateOf<MenuUiState>(MenuUiState.Loading) }
