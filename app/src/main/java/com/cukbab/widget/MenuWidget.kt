@@ -60,11 +60,11 @@ class MenuWidget : GlanceAppWidget() {
         suspend fun fetchAndRefresh(context: Context, glanceId: GlanceId) {
             val manager = GlanceAppWidgetManager(context)
             val widgetId = manager.getAppWidgetId(glanceId)
-            
+
             val cafeteria = WidgetPreferences.getSelectedCafeteria(context, widgetId)
             val category = WidgetPreferences.getSelectedCategory(context, widgetId)
             val fontSize = WidgetPreferences.getFontSize(context, widgetId)
-            
+
             // Pick the meal and day to show; after a meal ends this moves on to the next weekday.
             val target = WidgetSchedule.resolve(category)
             val jsonKey = target.jsonKey
@@ -78,41 +78,56 @@ class MenuWidget : GlanceAppWidget() {
                 else -> queryDate.dayOfWeek.getDisplayName(TextStyle.SHORT, context.resources.configuration.locales[0])
             }
             val headerTitle = "$cafeteria\n$categoryDisplay" + (dayLabel?.let { " · $it" } ?: "")
+            val dateKey = queryDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
-            val today = queryDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            val nowTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-
-            var menuText = context.getString(R.string.widget_no_menu_data)
-            try {
-                val menuData = withContext(Dispatchers.IO) {
-                    com.cukbab.data.MenuRepository.getMenu(context, queryDate, forceRefresh = true)
-                }
-                val rawMenu = menuData[jsonKey]?.get(today) ?: "No Menu"
-                menuText = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) context.getString(R.string.widget_no_menu_today) else rawMenu
-
+            fun menuTextFrom(menuData: com.cukbab.data.MenuData): String {
+                val rawMenu = menuData[jsonKey]?.get(dateKey) ?: "No Menu"
+                var text = if (rawMenu.trim() == "No Menu" || rawMenu.isEmpty()) context.getString(R.string.widget_no_menu_today) else rawMenu
                 if (jsonKey == "Pranzo-Korean" || jsonKey == "Pranzo-Global-Noodle") {
-                    val plusMenu = menuData["Pranzo-Plus-Corner"]?.get(today) ?: "No Menu"
+                    val plusMenu = menuData["Pranzo-Plus-Corner"]?.get(dateKey) ?: "No Menu"
                     if (plusMenu.trim() != "No Menu" && plusMenu.isNotEmpty()) {
-                        menuText += "\n\n[${context.getString(R.string.category_plus_corner)}]\n$plusMenu"
+                        text += "\n\n[${context.getString(R.string.category_plus_corner)}]\n$plusMenu"
                     }
                 }
-            } catch (e: com.cukbab.data.MenuNotPublishedException) {
-                menuText = context.getString(R.string.menu_not_published)
-            } catch (e: Exception) {
-                menuText = context.getString(R.string.widget_error)
+                return text
             }
 
-            // Update the internal state of the widget
-            updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
-                prefs.toMutablePreferences().apply {
-                    this[menuContentKey] = menuText
-                    this[headerTitleKey] = headerTitle
-                    this[lastUpdateKey] = nowTime
-                    this[menuFontSizeKey] = fontSize
+            // lastUpdate = time of the last successful download; null keeps the previous value.
+            suspend fun render(menuText: String, lastUpdate: String?) {
+                updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
+                    prefs.toMutablePreferences().apply {
+                        this[menuContentKey] = menuText
+                        this[headerTitleKey] = headerTitle
+                        if (lastUpdate != null) this[lastUpdateKey] = lastUpdate
+                        this[menuFontSizeKey] = fontSize
+                    }
                 }
+                MenuWidget().update(context, glanceId)
             }
-            // Trigger the UI update
-            MenuWidget().update(context, glanceId)
+
+            // 1. Cached menu right away. With Battery Saver on, background network is blocked and
+            //    the download below only fails after ~40 s of connect timeouts.
+            val cached = withContext(Dispatchers.IO) {
+                com.cukbab.data.MenuRepository.getCachedMenu(context, queryDate)
+            }
+            if (cached != null) render(menuTextFrom(cached), lastUpdate = null)
+
+            // 2. Fresh data when the network allows it.
+            try {
+                val menuData = withContext(Dispatchers.IO) {
+                    com.cukbab.data.MenuRepository.getMenu(context, queryDate, forceRefresh = true, fallbackToCache = false)
+                }
+                val nowTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+                render(menuTextFrom(menuData), lastUpdate = nowTime)
+            } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+                throw e
+            } catch (e: com.cukbab.data.MenuNotPublishedException) {
+                render(context.getString(R.string.menu_not_published), lastUpdate = null)
+            } catch (e: Exception) {
+                android.util.Log.w("WidgetRefresh", "menu download failed", e)
+                // Keep the cached menu if we showed one.
+                if (cached == null) render(context.getString(R.string.widget_error), lastUpdate = null)
+            }
         }
     }
 
@@ -121,7 +136,7 @@ class MenuWidget : GlanceAppWidget() {
             val prefs = currentState<Preferences>()
             val headerTitle = prefs[headerTitleKey] ?: "CUKbab"
             val menu = prefs[menuContentKey] ?: context.getString(R.string.widget_tap_to_refresh)
-            val lastUpdate = prefs[lastUpdateKey] ?: "--:--:--"
+            val lastUpdate = prefs[lastUpdateKey] ?: "--:--"
             val fontSize = prefs[menuFontSizeKey] ?: 11f
 
             GlanceTheme {

@@ -2,8 +2,10 @@ package com.cukbab.widget
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -80,6 +82,12 @@ object WidgetSchedule {
             ?: today.plusDays(1).atTime(0, 5)
     }
 
+    // Without a network constraint the job may run while the app's background network access is
+    // still blocked, and the menu download only gets through after ~40 s of timeouts.
+    private val networkConstraint = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+
     private const val WORK_NAME = "widget_meal_boundary_refresh"
     const val BOUNDARY_TAG = "widget_boundary"
 
@@ -95,6 +103,7 @@ object WidgetSchedule {
         val delayMs = Duration.between(now, nextBoundary(now)).toMillis() + 30_000
         val request = OneTimeWorkRequestBuilder<WidgetRefreshWorker>()
             .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
+            .setConstraints(networkConstraint)
             .addTag(BOUNDARY_TAG)
             .build()
         WorkManager.getInstance(context)
@@ -103,7 +112,9 @@ object WidgetSchedule {
 
     /** Refresh all widgets as soon as possible (network fetch runs in a worker). */
     fun refreshNow(context: Context) {
-        val request = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().build()
+        val request = OneTimeWorkRequestBuilder<WidgetRefreshWorker>()
+            .setConstraints(networkConstraint)
+            .build()
         WorkManager.getInstance(context)
             .enqueueUniqueWork(REFRESH_NOW_NAME, ExistingWorkPolicy.KEEP, request)
     }
@@ -124,6 +135,7 @@ class WidgetRefreshWorker(context: Context, params: WorkerParameters) : Coroutin
                 MenuWidget.fetchAndRefresh(applicationContext, id)
             } catch (e: Exception) {
                 // One broken widget shouldn't stop the others.
+                android.util.Log.w("WidgetRefresh", "refresh failed for $id", e)
             }
         }
         if (ids.isNotEmpty()) {
