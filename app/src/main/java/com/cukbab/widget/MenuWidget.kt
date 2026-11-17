@@ -184,7 +184,8 @@ class MenuWidget : GlanceAppWidget() {
 
 class RefreshAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        MenuWidget.fetchAndRefresh(context, glanceId)
+        // Fetching inside the action broadcast blocked it long enough to ANR; let a worker do it.
+        WidgetSchedule.refreshNow(context)
     }
 }
 
@@ -193,28 +194,16 @@ class MenuWidgetReceiver : GlanceAppWidgetReceiver() {
 
     // Periodic APPWIDGET_UPDATE (updatePeriodMillis) only re-renders stored state, so fetch
     // fresh menu data here; otherwise the widget keeps showing yesterday's menu.
+    // GlanceAppWidgetReceiver.onUpdate already calls goAsync() (a second call returns null and
+    // crashed the app), so hand the network fetch to WorkManager instead.
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+        WidgetSchedule.refreshNow(context)
         WidgetSchedule.scheduleNext(context)
-        val pendingResult = goAsync()
-        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-            try {
-                val manager = GlanceAppWidgetManager(context)
-                appWidgetIds.forEach { id ->
-                    try {
-                        MenuWidget.fetchAndRefresh(context, manager.getGlanceIdBy(id))
-                    } catch (e: Exception) {
-                        // Widget removed or not yet bound; skip.
-                    }
-                }
-            } finally {
-                pendingResult.finish()
-            }
-        }
     }
 
     override fun onDisabled(context: Context) {

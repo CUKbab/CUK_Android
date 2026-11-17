@@ -94,6 +94,15 @@ object WidgetSchedule {
             .enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, request)
     }
 
+    /** Refresh all widgets as soon as possible (network fetch runs in a worker). */
+    fun refreshNow(context: Context) {
+        val request = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().build()
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork(REFRESH_NOW_NAME, ExistingWorkPolicy.REPLACE, request)
+    }
+
+    private const val REFRESH_NOW_NAME = "widget_refresh_now"
+
     fun cancel(context: Context) {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
     }
